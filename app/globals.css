@@ -1,0 +1,192 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@400;500;600;700;800;900&display=swap');
+
+@layer base {
+  html {
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+  
+  body {
+    background-color: #C1BCB9;
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23A09790' fill-opacity='0.03'%3E%3Cpath d='M30 0v30h30V0H30zm15 15v15h15V15H45zM0 30v30h30V30H0zm15 15v15h15V30H15z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    color: #181510;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-palette-dark hover:bg-palette-deepest text-palette-light font-semibold py-3 px-6 rounded-lg transition-all duration-300 shadow-palette hover:shadow-book-hover transform hover:-translate-y-0.5;
+  }
+  
+  .btn-secondary {
+    @apply bg-transparent border-2 border-palette-dark text-palette-dark hover:bg-palette-dark hover:text-palette-light font-semibold py-3 px-6 rounded-lg transition-all duration-300;
+  }
+  
+  .card {
+    @apply bg-palette-light/90 backdrop-blur rounded-xl shadow-palette hover:shadow-book-hover transition-all duration-300 border border-palette-medium/20;
+  }
+  
+  .input-field {
+    @apply w-full px-4 py-3 border border-palette-medium rounded-lg focus:ring-2 focus:ring-palette-warm focus:border-transparent bg-palette-light text-palette-deepest placeholder-palette-dark;
+  }
+
+  .book-cover-fallback {
+    background: linear-gradient(135deg, #C1BCB9 0%, #A09790 100%);
+    border: 2px solid #3D392E;
+    position: relative;
+  }
+
+  .silhouette-shape {
+    position: relative;
+    background: linear-gradient(45deg, #C1BCB9 0%, #3D392E 100%);
+    clip-path: polygon(
+      50% 0%, 
+      80% 20%, 
+      100% 50%, 
+      80% 80%, 
+      50% 100%, 
+      20% 80%, 
+      0% 50%, 
+      20% 20%
+    );
+  }
+
+  .book-cover-pattern {
+    background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23A09790' fill-opacity='0.1'%3E%3Cpath d='M20 0v20h20V0H20zm10 10v10h10V10H30zM0 20v20h20V20H0zm10 10v10h10V20H10z'/%3E%3C/g%3E%3C/svg%3E");
+  }
+
+  /* Fixed Diamond Symbol with proper scaling */
+  .diamond-symbol {
+    width: 20px;
+    height: 20px;
+    background: #3D392E;
+    transform: rotate(45deg);
+    position: relative;
+    display: inline-block;
+    border-radius: 2px;
+  }
+
+  .diamond-symbol::before {
+    content: '';
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    width: 12px;
+    height: 12px;
+    background: #C1BCB9;
+    border-radius: 1px;
+    /* Remove the second transform */
+  }
+
+  /* Scale variations for diamond symbol */
+  .diamond-symbol.scale-25 {
+    width: 8px;
+    height: 8px;
+  }
+
+  .diamond-symbol.scale-25::before {
+    top: 1px;
+    left: 1px;
+    width: 6px;
+    height: 6px;
+  }
+
+  .diamond-symbol.scale-50 {
+    width: 12px;
+    height: 12px;
+  }
+
+  .diamond-symbol.scale-50::before {
+    top: 2px;
+    left: 2px;
+    width: 8px;
+    height: 8px;
+  }
+
+  .diamond-symbol.scale-75 {
+    width: 16px;
+    height: 16px;
+  }
+
+  .diamond-symbol.scale-75::before {
+    top: 3px;
+    left: 3px;
+    width: 10px;
+    height: 10px;
+  }
+
+  .diamond-symbol.scale-125 {
+    width: 28px;
+    height: 28px;
+  }
+
+  .diamond-symbol.scale-125::before {
+    top: 6px;
+    left: 6px;
+    width: 16px;
+    height: 16px;
+  }
+
+  /* Color variations for diamond symbol */
+  .diamond-symbol.bg-palette-warm {
+    background: #C88C5A;
+  }
+
+  .diamond-symbol.bg-palette-warm::before {
+    background: #C1BCB9;
+  }
+
+  .diamond-symbol.bg-cream-100 {
+    background: #C1BCB9;
+  }
+
+  .diamond-symbol.bg-cream-100::before {
+    background: #3D392E;
+  }
+
+  .diamond-symbol.bg-cream-300 {
+    background: #AFA79F;
+  }
+
+  .diamond-symbol.bg-cream-300::before {
+    background: #3D392E;
+  }
+
+  .layered-background {
+    background: linear-gradient(135deg, #C1BCB9 0%, #A09790 100%);
+    position: relative;
+  }
+
+  .layered-background::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23A09790' fill-opacity='0.05'%3E%3Cpath d='M30 0v30h30V0H30zm15 15v15h15V15H45zM0 30v30h30V30H0zm15 15v15h15V30H15z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    pointer-events: none;
+  }
+
+  /* Enhanced logo palette with fallback */
+  .logo-palette {
+    background: linear-gradient(135deg, #C88C5A 0%, #A09790 50%, #3D392E 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    /* Fallback for browsers that don't support background-clip: text */
+    color: #3D392E;
+  }
+
+  /* Ensure logo gradient works in all browsers */
+  @supports not (-webkit-background-clip: text) {
+    .logo-palette {
+      color: #C88C5A;
+      background: none;
+      font-weight: 800;
+    }
+  }
+}
