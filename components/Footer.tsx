@@ -11,7 +11,9 @@ export default function Footer() {
               <div className="w-8 h-8 bg-burgundy-600 rounded-lg flex items-center justify-center">
                 <Book className="w-5 h-5 text-white" />
               </div>
-              <span className="text-xl font-bold">The Paradox Engine</span>
+              <span className={`text-xl font-bold logo-palette ${process.env.NEXT_PUBLIC_LOGO_FONT || 'font-serif'}`}>
+                The Paradox Engine
+              </span>
             </div>
             <p className="text-gray-300 mb-6 max-w-md">
               Transform tension into momentum. Join thousands of readers discovering how to harness life's 
@@ -92,7 +94,7 @@ export default function Footer() {
         <div className="border-t border-gray-800 mt-12 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="text-gray-400 text-sm mb-4 md:mb-0">
-              © 2024 The Paradox Engine by Thomas Njeru. All rights reserved.
+              © 2025 The Paradox Engine by Thomas Njeru. All rights reserved.
             </div>
             <div className="flex space-x-6 text-sm">
               <a href="/privacy" className="text-gray-400 hover:text-white transition-colors">
