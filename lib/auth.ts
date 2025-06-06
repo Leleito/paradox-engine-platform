@@ -105,13 +105,14 @@ export const authOptions: NextAuthOptions = {
       return session
     }
   },
-  pages: {
-    signIn: '/admin/login',
-    error: '/admin/error'
-  },
+  // Removed custom pages to prevent redirect loops
+  // pages: {
+  //   signIn: '/admin/login',
+  //   error: '/admin/error'
+  // },
   session: {
     strategy: 'jwt',
     maxAge: 24 * 60 * 60 // 24 hours
   },
-  secret: process.env.NEXTAUTH_SECRET || 'fallback-secret-for-dev'
+  secret: process.env.NEXTAUTH_SECRET
 } 
