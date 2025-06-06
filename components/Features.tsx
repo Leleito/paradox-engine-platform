@@ -35,7 +35,7 @@ const features = [
 
 export default function Features() {
   return (
-    <section className="py-20 layered-background">
+    <section id="features" className="py-20 layered-background">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <div className="inline-flex items-center justify-center mb-4">

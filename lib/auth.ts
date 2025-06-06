@@ -37,7 +37,7 @@ const ADMIN_CREDENTIALS = [
   },
   {
     email: 'pe@laitigosystems.com',
-    password: 'secure2024PE!' // Secure password for production admin
+    password: 'secure2025PE!' // Updated password for 2025
   }
 ]
 
@@ -85,10 +85,9 @@ export const authOptions: NextAuthOptions = {
   ],
   callbacks: {
     async signIn({ user, account }) {
-      // For Google OAuth, check if user is admin
+      // Allow ALL Google OAuth users (subscribers + admins)
       if (account?.provider === 'google') {
-        const isAdmin = ADMIN_EMAILS.includes(user.email || '')
-        return isAdmin
+        return true  // ✅ Allow all Google users for subscription platform
       }
       return true
     },

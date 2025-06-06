@@ -45,7 +45,7 @@ export default function BookPreview() {
   const [selectedChapter, setSelectedChapter] = useState(chapters[0])
 
   return (
-    <section className="py-20 bg-white">
+    <section id="preview" className="py-20 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-16">
