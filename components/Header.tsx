@@ -1,106 +1,108 @@
 'use client'
 
 import { useState } from 'react'
-import { Menu, X, Book } from 'lucide-react'
+import Link from 'next/link'
+import { motion, AnimatePresence } from 'framer-motion'
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
 
+  const navItems = [
+    { href: '/', label: 'Home' },
+    { href: '/musings', label: 'Musings' },
+    { href: '/dashboard', label: 'Dashboard' },
+  ]
+
   return (
-    <header className="fixed top-0 left-0 right-0 bg-palette-light/95 backdrop-blur-sm z-50 border-b border-palette-medium shadow-palette">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          {/* Logo with palette gradient */}
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-palette-dark rounded-xl flex items-center justify-center shadow-palette">
-              <div className="diamond-symbol scale-75 bg-palette-warm"></div>
+    <header className="fixed top-0 left-0 right-0 z-50 bg-cream-50/95 backdrop-blur-sm border-b border-burgundy-800/10">
+      <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16">
+          {/* Logo */}
+          <Link href="/" className="flex items-center gap-3 group">
+            <div className="w-10 h-10 bg-burgundy-800 rounded-full flex items-center justify-center group-hover:bg-burgundy-700 transition-colors">
+              <span className="text-gold-400 font-display font-bold text-lg">PE</span>
             </div>
-            <span className="text-xl font-bold logo-palette font-serif">The Paradox Engine</span>
-          </div>
+            <span className="font-display text-xl text-burgundy-800 hidden sm:block">
+              Personal Evolution
+            </span>
+          </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex space-x-8">
-            <a href="#preview" className="text-palette-dark hover:text-palette-deepest transition-colors font-medium">
-              Preview
-            </a>
-            <a href="#features" className="text-palette-dark hover:text-palette-deepest transition-colors font-medium">
-              Features
-            </a>
-            <a href="/musings" className="text-palette-dark hover:text-palette-deepest transition-colors font-medium">
-              Musings
-            </a>
-            <a href="#community" className="text-palette-dark hover:text-palette-deepest transition-colors font-medium">
-              Community
-            </a>
-          </nav>
-
-          {/* CTA Button */}
-          <div className="hidden md:flex items-center space-x-4">
-            <a href="#newsletter" className="btn-secondary text-sm">
-              Get Updates
-            </a>
-            <a href="/subscribe" className="bg-palette-warm hover:bg-palette-warm/90 text-palette-deepest font-semibold py-2 px-4 rounded-lg transition-all duration-300 text-sm shadow-palette">
-              Subscribe Now
-            </a>
+          <div className="hidden md:flex items-center gap-8">
+            {navItems.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="nav-link"
+              >
+                {item.label}
+              </Link>
+            ))}
+            <Link
+              href="/subscribe"
+              className="btn-gold text-sm"
+            >
+              Join Early Access
+            </Link>
           </div>
 
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="md:hidden p-2 rounded-lg hover:bg-palette-medium transition-colors"
+            className="md:hidden p-2 text-burgundy-800 hover:text-burgundy-700"
+            aria-label="Toggle menu"
           >
-            {isMenuOpen ? (
-              <X className="w-6 h-6 text-palette-dark" />
-            ) : (
-              <Menu className="w-6 h-6 text-palette-dark" />
-            )}
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              {isMenuOpen ? (
+                <path d="M6 18L18 6M6 6l12 12" />
+              ) : (
+                <path d="M4 6h16M4 12h16M4 18h16" />
+              )}
+            </svg>
           </button>
         </div>
 
-        {/* Mobile Menu */}
-        {isMenuOpen && (
-          <div className="md:hidden py-4 border-t border-palette-medium bg-palette-light/95 book-cover-pattern">
-            <nav className="flex flex-col space-y-4">
-              <a
-                href="#preview"
-                className="text-palette-dark hover:text-palette-deepest transition-colors px-2 py-1 font-medium"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Preview
-              </a>
-              <a
-                href="#features"
-                className="text-palette-dark hover:text-palette-deepest transition-colors px-2 py-1 font-medium"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Features
-              </a>
-              <a
-                href="/musings"
-                className="text-palette-dark hover:text-palette-deepest transition-colors px-2 py-1 font-medium"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Musings
-              </a>
-              <a
-                href="#community"
-                className="text-palette-dark hover:text-palette-deepest transition-colors px-2 py-1 font-medium"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Community
-              </a>
-              <div className="flex flex-col space-y-2 pt-4 border-t border-palette-medium">
-                <a href="#newsletter" className="btn-secondary text-sm">
-                  Get Updates
-                </a>
-                <a href="/subscribe" className="bg-palette-warm hover:bg-palette-warm/90 text-palette-deepest font-semibold py-2 px-4 rounded-lg transition-all duration-300 text-sm shadow-palette">
-                  Subscribe Now
-                </a>
+        {/* Mobile Navigation */}
+        <AnimatePresence>
+          {isMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.3 }}
+              className="md:hidden overflow-hidden"
+            >
+              <div className="py-4 space-y-3 border-t border-burgundy-800/10">
+                {navItems.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className="block px-4 py-2 text-burgundy-800 hover:text-gold-600 font-serif"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+                <Link
+                  href="/subscribe"
+                  className="block mx-4 text-center btn-gold text-sm"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Join Early Access
+                </Link>
               </div>
-            </nav>
-          </div>
-        )}
-      </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </nav>
     </header>
   )
 }

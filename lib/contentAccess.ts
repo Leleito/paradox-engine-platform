@@ -218,4 +218,12 @@ export const trackContentAccess = (
   // Track content access attempts for analytics
   // This would integrate with your analytics service
   console.log('Content access:', { userId, contentType, contentId, accessGranted })
+}
+
+// Simple helper function for component usage
+export const canAccessContent = (userTier: SubscriptionTier, isPremium: boolean): boolean => {
+  if (!isPremium) return true // Free content
+  
+  // Premium content requires premium or vip tier
+  return userTier === 'premium' || userTier === 'vip'
 } 

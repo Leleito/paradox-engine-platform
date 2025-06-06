@@ -1,132 +1,175 @@
 'use client'
 
-import React from 'react'
 import { useState } from 'react'
-import LeadMagnetModal from './LeadMagnetModal'
+import Image from 'next/image'
+import { motion } from 'framer-motion'
 
 export default function Hero() {
-  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [email, setEmail] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [message, setMessage] = useState('')
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsSubmitting(true)
+    setMessage('')
+
+    try {
+      const response = await fetch('/api/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, type: 'early-adopter' })
+      })
+
+      if (response.ok) {
+        setMessage('Welcome! Check your email for your first weekly insight.')
+        setEmail('')
+      } else {
+        setMessage('Something went wrong. Please try again.')
+      }
+    } catch (error) {
+      setMessage('Something went wrong. Please try again.')
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
 
   return (
-    <section className="relative min-h-screen flex items-center py-20 overflow-hidden">
-      <div className="container mx-auto px-6 lg:px-8">
-        <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
-          {/* Left Content */}
-          <div className="flex-1 max-w-2xl">
-            <div className="text-center lg:text-left">
-              <div className="flex items-center justify-center lg:justify-start gap-3 mb-6">
-                <div className="diamond-symbol bg-palette-warm scale-75"></div>
-                <h1 className="text-4xl lg:text-6xl font-bold font-display logo-palette">
-                  The Paradox Engine
-                </h1>
-                <div className="diamond-symbol bg-palette-warm scale-75"></div>
+    <section className="relative min-h-screen flex items-center justify-center px-4 py-20">
+      {/* Background gradient */}
+      <div className="absolute inset-0 bg-gradient-to-br from-burgundy-900 via-burgundy-800 to-burgundy-900 opacity-10" />
+      
+      <div className="relative z-10 max-w-6xl mx-auto">
+        <div className="grid lg:grid-cols-2 gap-12 items-center">
+          {/* Content */}
+          <motion.div 
+            initial={{ opacity: 0, x: -50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8 }}
+            className="text-center lg:text-left"
+          >
+            {/* Early Adopter Badge */}
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-gold-500/20 rounded-full mb-6">
+              <span className="w-2 h-2 bg-gold-500 rounded-full animate-pulse" />
+              <span className="text-sm font-serif text-burgundy-800">Early Adopter Access</span>
+            </div>
+
+            <h1 className="text-book-title mb-6">
+              Transform Your
+              <span className="block text-gradient-gold">Personal Evolution</span>
+            </h1>
+
+            <p className="text-prose mb-8 text-burgundy-700">
+              Join our exclusive early adopter community and receive weekly insights 
+              on personal growth, mindset transformation, and life mastery. 
+              Be among the first to experience our revolutionary approach to personal evolution.
+            </p>
+
+            {/* Benefits */}
+            <div className="space-y-3 mb-8">
+              <div className="flex items-center gap-3">
+                <div className="w-5 h-5 bg-gold-500 rounded-full flex items-center justify-center">
+                  <span className="text-burgundy-900 text-xs">✓</span>
+                </div>
+                <span className="text-burgundy-800 font-serif">Weekly transformational content</span>
               </div>
-              
-              <p className="text-lg lg:text-xl text-palette-dark mb-8 font-medium">
-                Master the art of turning tension into triumph. 
-                Discover how Kenya's most successful entrepreneurs 
-                transform conflict into competitive advantage.
-              </p>
-              
-              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-8">
-                <button 
-                  onClick={() => setIsModalOpen(true)}
-                  className="btn-primary text-lg px-8 py-4"
-                >
-                  Get Free Sample Chapters
-                </button>
-                <a 
-                  href="#preview" 
-                  className="btn-secondary text-lg px-8 py-4"
-                >
-                  Read Preview
-                </a>
+              <div className="flex items-center gap-3">
+                <div className="w-5 h-5 bg-gold-500 rounded-full flex items-center justify-center">
+                  <span className="text-burgundy-900 text-xs">✓</span>
+                </div>
+                <span className="text-burgundy-800 font-serif">Exclusive early adopter benefits</span>
               </div>
-              
-              <div className="flex items-center gap-8 text-sm text-palette-dark justify-center lg:justify-start">
-                <div className="flex items-center gap-2">
-                  <div className="diamond-symbol bg-cream-100 scale-25"></div>
-                  <span>150+ Early Readers</span>
+              <div className="flex items-center gap-3">
+                <div className="w-5 h-5 bg-gold-500 rounded-full flex items-center justify-center">
+                  <span className="text-burgundy-900 text-xs">✓</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <div className="diamond-symbol bg-cream-100 scale-25"></div>
-                  <span>4.9/5 Pre-Launch Rating</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="diamond-symbol bg-cream-100 scale-25"></div>
-                  <span>Coming Soon</span>
-                </div>
+                <span className="text-burgundy-800 font-serif">First access to new features</span>
               </div>
             </div>
-          </div>
 
-          {/* Right Content - Book Visual */}
-          <div className="flex-1 flex justify-center lg:justify-end">
-            <div className="relative">
-              {/* Book Cover */}
-              <div className="book-cover-fallback w-80 h-96 rounded-lg shadow-2xl border-4 border-palette-dark relative overflow-hidden">
+            {/* Signup Form */}
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="flex flex-col sm:flex-row gap-3">
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Enter your email"
+                  required
+                  className="input-elegant flex-1"
+                />
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="btn-book whitespace-nowrap"
+                >
+                  {isSubmitting ? 'Joining...' : 'Join Early Access'}
+                </button>
+              </div>
+              
+              {message && (
+                <motion.p 
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className={`text-sm font-serif ${
+                    message.includes('Welcome') ? 'text-gold-600' : 'text-burgundy-600'
+                  }`}
+                >
+                  {message}
+                </motion.p>
+              )}
+            </form>
+
+            <p className="text-sm text-burgundy-600 mt-4 font-serif">
+              No payment required • Unsubscribe anytime • Your journey starts now
+            </p>
+          </motion.div>
+
+          {/* Book Preview */}
+          <motion.div 
+            initial={{ opacity: 0, x: 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="relative"
+          >
+            <div className="relative mx-auto max-w-md">
+              {/* Book shadow */}
+              <div className="absolute inset-0 bg-burgundy-900/20 blur-2xl transform translate-y-8" />
+              
+              {/* Book cover */}
+              <div className="relative bg-gradient-to-br from-burgundy-800 to-burgundy-900 rounded-sm shadow-2xl overflow-hidden aspect-[3/4]">
+                {/* Gold accent */}
+                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-gold-600 to-gold-400" />
+                
                 {/* Book spine effect */}
-                <div className="absolute left-0 top-0 w-6 h-full bg-palette-dark"></div>
+                <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-burgundy-900 to-transparent opacity-50" />
                 
-                {/* Book cover pattern */}
-                <div className="book-cover-pattern absolute inset-0 opacity-30"></div>
-                
-                {/* Book cover content */}
-                <div className="absolute inset-0 flex flex-col justify-between p-8 text-palette-deepest">
-                  <div className="text-center">
-                    <div className="flex justify-center mb-4">
-                      <div className="diamond-symbol bg-palette-warm scale-125"></div>
-                    </div>
-                    <h3 className="text-2xl font-bold font-display mb-2">THE</h3>
-                    <h2 className="text-3xl font-black font-display mb-2">PARADOX</h2>
-                    <h3 className="text-2xl font-bold font-display">ENGINE</h3>
+                {/* Content */}
+                <div className="relative h-full flex flex-col items-center justify-center p-12 text-center">
+                  <div className="w-16 h-16 bg-gold-500 rounded-full mb-6 flex items-center justify-center">
+                    <span className="text-burgundy-900 text-2xl font-display">PE</span>
                   </div>
                   
-                  <div className="text-center">
-                    <div className="flex justify-center gap-2 mb-4">
-                      <div className="diamond-symbol bg-cream-300 scale-50"></div>
-                      <div className="diamond-symbol bg-cream-300 scale-25"></div>
-                      <div className="diamond-symbol bg-cream-300 scale-50"></div>
-                    </div>
-                    <p className="text-lg font-semibold">THOMAS NJERU</p>
+                  <h2 className="text-3xl font-display text-cream-50 mb-4">
+                    Personal
+                    <span className="block text-gold-400">Evolution</span>
+                  </h2>
+                  
+                  <div className="divider-gold my-6" />
+                  
+                  <p className="text-cream-100 font-serif text-sm">
+                    Your Guide to Transformation
+                  </p>
+                  
+                  <div className="absolute bottom-8 left-0 right-0 text-center">
+                    <p className="text-gold-400 text-xs font-serif">Early Adopter Edition</p>
                   </div>
                 </div>
-                
-                {/* Layered silhouette effect */}
-                <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
-                  <div className="silhouette-shape w-16 h-16 opacity-20"></div>
-                </div>
-                <div className="absolute right-8 top-1/3 transform -translate-y-1/2">
-                  <div className="silhouette-shape w-12 h-12 opacity-30"></div>
-                </div>
-                <div className="absolute right-6 bottom-1/4 transform translate-y-1/2">
-                  <div className="silhouette-shape w-8 h-8 opacity-40"></div>
-                </div>
               </div>
-
-              {/* Floating elements */}
-              <div className="absolute -top-4 -right-4 w-8 h-8 bg-palette-warm rounded-full opacity-60 animate-pulse"></div>
-              <div className="absolute -bottom-4 -left-4 w-6 h-6 bg-palette-medium rounded-full opacity-40 animate-pulse delay-1000"></div>
-              <div className="absolute top-1/4 -left-8 w-4 h-4 bg-palette-warm rounded-full opacity-50 animate-pulse delay-500"></div>
-              
-              {/* Background glow */}
-              <div className="absolute inset-0 bg-gradient-to-r from-palette-warm/10 to-palette-medium/10 rounded-lg blur-xl -z-10 scale-110"></div>
             </div>
-          </div>
+          </motion.div>
         </div>
       </div>
-
-      {/* Background decoration */}
-      <div className="absolute top-0 left-0 w-full h-full overflow-hidden -z-10">
-        <div className="absolute top-1/4 left-1/4 w-32 h-32 bg-palette-warm/5 rounded-full blur-2xl"></div>
-        <div className="absolute bottom-1/3 right-1/4 w-48 h-48 bg-palette-medium/5 rounded-full blur-3xl"></div>
-        <div className="absolute top-1/2 right-1/3 w-24 h-24 bg-palette-dark/5 rounded-full blur-xl"></div>
-      </div>
-
-      <LeadMagnetModal 
-        isOpen={isModalOpen} 
-        onClose={() => setIsModalOpen(false)} 
-      />
     </section>
   )
 }

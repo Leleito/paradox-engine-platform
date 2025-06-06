@@ -1,262 +1,213 @@
 'use client'
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { getBlogPosts, getBlogCategories, getFeaturedPosts, type BlogPost, type BlogCategory } from '@/lib/sanity';
 
 export default function MusingsPage() {
-  const featuredPosts = [
-    {
-      id: 1,
-      title: "The Abyss and the Apex: Navigating Rock Bottom and Cliff Top",
-      excerpt: "Life is a relentless pendulum, swinging between extremes that test the soul. Discover how these moments of despair and excess become profound teachers.",
-      category: "Philosophy",
-      readTime: "15 min read",
-      slug: "abyss-and-apex",
-      featured: true
-    },
-    {
-      id: 2,
-      title: "The Soulmate You Can't Escape: Embracing Your Greatest Teachers",
-      excerpt: "What if the person who triggers you most is your greatest teacher? Explore the paradox of difficult relationships and transformative growth.",
-      category: "Relationships",
-      readTime: "12 min read",
-      slug: "soulmate-you-cant-escape",
-      featured: true
-    },
-    {
-      id: 3,
-      title: "Dancing with the Divine: Faith and Fear in the Human Journey",
-      excerpt: "A spiritual exploration of how faith can become fear, and how to find God in the mess of human contradiction and doubt.",
-      category: "Spirituality",
-      readTime: "18 min read",
-      slug: "faith-and-fear",
-      featured: true
+  const [allPosts, setAllPosts] = useState<BlogPost[]>([]);
+  const [featuredPosts, setFeaturedPosts] = useState<BlogPost[]>([]);
+  const [categories, setCategories] = useState<BlogCategory[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const [postsData, featuredData, categoriesData] = await Promise.all([
+          getBlogPosts(),
+          getFeaturedPosts(),
+          getBlogCategories()
+        ]);
+        
+        setAllPosts(postsData);
+        setFeaturedPosts(featuredData);
+        
+        const allCategory: BlogCategory = { 
+          _id: 'all', 
+          name: 'All', 
+          slug: { current: 'all' }, 
+          postCount: postsData.length 
+        };
+        setCategories([allCategory, ...categoriesData]);
+      } catch (error) {
+        console.error('Error fetching blog data:', error);
+      } finally {
+        setIsLoading(false);
+      }
     }
-  ];
 
-  const allPosts = [
-    ...featuredPosts,
-    {
-      id: 4,
-      title: "The Paradox of Love: When Your Love Language Becomes Toxic",
-      excerpt: "How the ways we seek love can transform into traits that push others away, and the journey to wholeness through shadow work.",
-      category: "Psychology",
-      readTime: "14 min read",
-      slug: "love-language-paradox",
-      featured: false
-    },
-    {
-      id: 5,
-      title: "Dark Matter and Dark Energy: The Cosmic Oddballs We Can't See",
-      excerpt: "A humorous dive into the universe's biggest mysteries—the invisible forces that shape everything yet remain tantalizingly out of reach.",
-      category: "Science",
-      readTime: "16 min read",
-      slug: "dark-matter-energy",
-      featured: false
-    },
-    {
-      id: 6,
-      title: "The Dance of Scripts and Surrender: Navigating Life's Duality",
-      excerpt: "The tension between holding life scripts and listening to the universe—and how to dance between structure and flow.",
-      category: "Philosophy",
-      readTime: "13 min read",
-      slug: "scripts-and-surrender",
-      featured: false
-    },
-    {
-      id: 7,
-      title: "Cosmic Consciousness: Are We All Just Stardust Playing Peek-a-Boo?",
-      excerpt: "Exploring the wild idea that everything in the universe shares a cosmic awareness—from your morning chai to distant galaxies.",
-      category: "Consciousness",
-      readTime: "17 min read",
-      slug: "cosmic-consciousness",
-      featured: false
-    },
-    {
-      id: 8,
-      title: "Unpacking Carl Jung's Shadow: The Hidden Side You Didn't Know You Had",
-      excerpt: "Meet the part of your personality that's been hiding in the shadows—and why befriending it might be the key to wholeness.",
-      category: "Psychology",
-      readTime: "19 min read",
-      slug: "jung-shadow-secular",
-      featured: false
-    },
-    {
-      id: 9,
-      title: "The Steel Man's Secret: Building Bridges in the Absurd Dance of Debate",
-      excerpt: "Why strengthening your opponent's argument before critiquing it might be the most powerful tool for truth-seeking and connection.",
-      category: "Philosophy",
-      readTime: "11 min read",
-      slug: "steel-man-argument",
-      featured: false
-    },
-    {
-      id: 10,
-      title: "The Paradox of Knowing: When Expertise Breeds Doubt",
-      excerpt: "Why luminaries often doubt their life's work, and how the more you learn, the more you realize you don't know.",
-      category: "Knowledge",
-      readTime: "15 min read",
-      slug: "paradox-of-knowing",
-      featured: false
-    },
-    {
-      id: 11,
-      title: "The Paradox of Praise: Why Cheering Effort Beats Crowning Smarts",
-      excerpt: "How praising children for being 'smart' can backfire, and why celebrating effort builds more resilient, curious minds.",
-      category: "Psychology",
-      readTime: "12 min read",
-      slug: "paradox-of-praise",
-      featured: false
-    },
-    {
-      id: 12,
-      title: "The Paradox of Fear: Leaning into the Storm to Find Freedom",
-      excerpt: "Why the only way to shrink fear is to face it head-on, and how exposure transforms terror into routine, routine into freedom.",
-      category: "Personal Growth",
-      readTime: "14 min read",
-      slug: "paradox-of-fear",
-      featured: false
-    },
-    {
-      id: 13,
-      title: "The Great Ego Takedown: Surfing the Paradox of Pride",
-      excerpt: "How pride protects yet paralyzes us, and practical steps to tame the ego for a more fulfilling, connected life.",
-      category: "Personal Growth",
-      readTime: "16 min read",
-      slug: "ego-takedown",
-      featured: false
-    }
-  ];
-
-  const categories = [
-    "All",
-    "Philosophy", 
-    "Psychology",
-    "Spirituality",
-    "Personal Growth",
-    "Relationships",
-    "Science",
-    "Consciousness",
-    "Knowledge"
-  ];
-
-  const [selectedCategory, setSelectedCategory] = React.useState("All");
+    fetchData();
+  }, []);
 
   const filteredPosts = selectedCategory === "All" 
     ? allPosts 
-    : allPosts.filter(post => post.category === selectedCategory);
+    : allPosts.filter(post => post.category?.name === selectedCategory);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-palette-light py-20">
+        <section className="container mx-auto px-6 lg:px-8 mb-16">
+          <div className="text-center mb-12">
+            <div className="animate-pulse">
+              <div className="h-16 bg-gray-200 rounded mb-6"></div>
+              <div className="h-6 bg-gray-200 rounded max-w-3xl mx-auto"></div>
+            </div>
+          </div>
+          
+          <div className="flex flex-wrap justify-center gap-3 mb-12">
+            {[1,2,3,4,5].map(i => (
+              <div key={i} className="animate-pulse">
+                <div className="h-8 w-20 bg-gray-200 rounded-full"></div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="container mx-auto px-6 lg:px-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[1,2,3,4,5,6].map(i => (
+              <div key={i} className="animate-pulse">
+                <div className="h-64 bg-gray-200 rounded-lg"></div>
+              </div>
+            ))}
+          </div>
+        </section>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-palette-light py-20">
       {/* Hero Section */}
       <section className="container mx-auto px-6 lg:px-8 mb-16">
-            <div className="text-center mb-12">
-              <h1 className="text-4xl lg:text-6xl font-bold font-display text-palette-deepest mb-6">
-                Musings from the 
-                <span className="logo-palette"> Paradox Engine</span>
-              </h1>
-              <p className="text-xl text-palette-dark max-w-3xl mx-auto">
-                Exploring life's beautiful contradictions, absurd tensions, and transformative dualities. 
-                These writings dive deep into the human experience—where growth happens in the gap between certainty and doubt.
-              </p>
-            </div>
+        <div className="text-center mb-12">
+          <h1 className="text-4xl lg:text-6xl font-bold font-display text-palette-deepest mb-6">
+            Musings from the 
+            <span className="logo-palette"> Paradox Engine</span>
+          </h1>
+          <p className="text-xl text-palette-dark max-w-3xl mx-auto">
+            Exploring life's beautiful contradictions, absurd tensions, and transformative dualities. 
+            These writings dive deep into the human experience—where growth happens in the gap between certainty and doubt.
+          </p>
+        </div>
 
-            {/* Category Filter */}
-            <div className="flex flex-wrap justify-center gap-3 mb-12">
-              {categories.map((category) => (
-                <button
-                  key={category}
-                  onClick={() => setSelectedCategory(category)}
-                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
-                    selectedCategory === category
-                      ? 'bg-palette-dark text-palette-light'
-                      : 'bg-palette-medium/20 text-palette-dark hover:bg-palette-medium/40'
-                  }`}
-                >
-                  {category}
-                </button>
-              ))}
-            </div>
-          </section>
+        {/* Category Filter */}
+        <div className="flex flex-wrap justify-center gap-3 mb-12">
+          {categories.map((category) => (
+            <button
+              key={category._id}
+              onClick={() => setSelectedCategory(category.name)}
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
+                selectedCategory === category.name
+                  ? 'bg-palette-dark text-palette-light'
+                  : 'bg-palette-medium/20 text-palette-dark hover:bg-palette-medium/40'
+              }`}
+            >
+              {category.name} {category.name !== 'All' && `(${category.postCount})`}
+            </button>
+          ))}
+        </div>
+      </section>
 
-          {/* Featured Posts */}
-          {selectedCategory === "All" && (
-            <section className="container mx-auto px-6 lg:px-8 mb-16">
-              <h2 className="text-3xl font-bold font-display text-palette-deepest mb-8 text-center">
-                Featured Explorations
-              </h2>
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {featuredPosts.map((post) => (
-                  <article key={post.id} className="card p-6 group hover:scale-105 transition-transform duration-300">
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="diamond-symbol bg-palette-warm scale-50"></div>
-                      <span className="text-sm font-medium text-palette-warm">{post.category}</span>
-                    </div>
-                    <h3 className="text-xl font-bold text-palette-deepest mb-3 group-hover:text-palette-dark transition-colors">
-                      {post.title}
-                    </h3>
-                    <p className="text-palette-dark mb-4 text-sm leading-relaxed">
-                      {post.excerpt}
-                    </p>
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs text-palette-medium">{post.readTime}</span>
-                      <Link 
-                        href={`/musings/${post.slug}`}
-                        className="text-palette-dark hover:text-palette-deepest font-medium text-sm transition-colors"
-                      >
-                        Read More →
-                      </Link>
-                    </div>
-                  </article>
-                ))}
-              </div>
-            </section>
-          )}
+      {/* Featured Posts */}
+      {selectedCategory === "All" && featuredPosts.length > 0 && (
+        <section className="container mx-auto px-6 lg:px-8 mb-16">
+          <h2 className="text-3xl font-bold font-display text-palette-deepest mb-8 text-center">
+            Featured Explorations
+          </h2>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {featuredPosts.map((post) => (
+              <article key={post._id} className="card p-6 group hover:scale-105 transition-transform duration-300">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="diamond-symbol bg-palette-warm scale-50"></div>
+                  <span className="text-sm font-medium text-palette-warm">
+                    {post.category?.name || 'Uncategorized'}
+                  </span>
+                </div>
+                <h3 className="text-xl font-bold text-palette-deepest mb-3 group-hover:text-palette-dark transition-colors">
+                  {post.title}
+                </h3>
+                <p className="text-palette-dark mb-4 text-sm leading-relaxed">
+                  {post.excerpt}
+                </p>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-palette-medium">{post.readTime} min read</span>
+                  <Link 
+                    href={`/musings/${post.slug.current}`}
+                    className="text-palette-dark hover:text-palette-deepest font-medium text-sm transition-colors"
+                  >
+                    Read More →
+                  </Link>
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+      )}
 
-          {/* All Posts Grid */}
-          <section className="container mx-auto px-6 lg:px-8">
-            <h2 className="text-3xl font-bold font-display text-palette-deepest mb-8 text-center">
-              {selectedCategory === "All" ? "All Musings" : `${selectedCategory} Articles`}
-            </h2>
-            
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredPosts.map((post) => (
-                <article key={post.id} className={`card p-6 group hover:scale-105 transition-all duration-300 ${post.featured && selectedCategory === "All" ? 'opacity-50' : ''}`}>
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="diamond-symbol bg-palette-warm scale-25"></div>
-                    <span className="text-sm font-medium text-palette-warm">{post.category}</span>
-                    {post.featured && (
-                      <span className="text-xs bg-palette-dark text-palette-light px-2 py-1 rounded-full">
-                        Featured
-                      </span>
+      {/* All Posts Grid */}
+      <section className="container mx-auto px-6 lg:px-8">
+        <h2 className="text-3xl font-bold font-display text-palette-deepest mb-8 text-center">
+          {selectedCategory === "All" ? "All Musings" : `${selectedCategory} Articles`}
+        </h2>
+        
+        {filteredPosts.length > 0 ? (
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredPosts.map((post) => (
+              <article key={post._id} className={`card p-6 group hover:scale-105 transition-all duration-300 ${post.featured && selectedCategory === "All" ? 'opacity-50' : ''}`}>
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="diamond-symbol bg-palette-warm scale-25"></div>
+                  <span className="text-sm font-medium text-palette-warm">
+                    {post.category?.name || 'Uncategorized'}
+                  </span>
+                  {post.featured && (
+                    <span className="text-xs bg-palette-dark text-palette-light px-2 py-1 rounded-full">
+                      Featured
+                    </span>
+                  )}
+                  {post.isPremium && (
+                    <span className="text-xs bg-gold-500 text-white px-2 py-1 rounded-full">
+                      Premium
+                    </span>
+                  )}
+                </div>
+                <h3 className="text-lg font-bold text-palette-deepest mb-3 group-hover:text-palette-dark transition-colors">
+                  {post.title}
+                </h3>
+                <p className="text-palette-dark mb-4 text-sm leading-relaxed">
+                  {post.excerpt}
+                </p>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-xs text-palette-medium">
+                    <span>{post.readTime} min read</span>
+                    {post.author && (
+                      <>
+                        <span>•</span>
+                        <span>by {post.author.name}</span>
+                      </>
                     )}
                   </div>
-                  <h3 className="text-lg font-bold text-palette-deepest mb-3 group-hover:text-palette-dark transition-colors">
-                    {post.title}
-                  </h3>
-                  <p className="text-palette-dark mb-4 text-sm leading-relaxed">
-                    {post.excerpt}
-                  </p>
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-palette-medium">{post.readTime}</span>
-                    <Link 
-                      href={`/musings/${post.slug}`}
-                      className="text-palette-dark hover:text-palette-deepest font-medium text-sm transition-colors"
-                    >
-                      Read More →
-                    </Link>
-                  </div>
-                </article>
-              ))}
-            </div>
-
-            {filteredPosts.length === 0 && (
-              <div className="text-center py-12">
-                <div className="diamond-symbol bg-palette-medium scale-125 mx-auto mb-4"></div>
-                <p className="text-palette-dark">No articles found in this category yet.</p>
-              </div>
-            )}
-          </section>
+                  <Link 
+                    href={`/musings/${post.slug.current}`}
+                    className="text-palette-dark hover:text-palette-deepest font-medium text-sm transition-colors"
+                  >
+                    Read More →
+                  </Link>
+                </div>
+              </article>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-12">
+            <div className="diamond-symbol bg-palette-medium scale-125 mx-auto mb-4"></div>
+            <p className="text-palette-dark">No articles found in this category yet.</p>
+            <p className="text-palette-medium text-sm mt-2">
+              Content will be available once published in Sanity Studio.
+            </p>
+          </div>
+        )}
+      </section>
 
       {/* Call to Action */}
       <section className="container mx-auto px-6 lg:px-8 mt-20">

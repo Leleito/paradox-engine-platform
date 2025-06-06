@@ -62,4 +62,8 @@ Thumbs.db
 
 # Temporary folders
 tmp/
-temp/ 
+temp/
+
+# Sanity
+.sanity/ 
+node_modules

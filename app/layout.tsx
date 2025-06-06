@@ -43,19 +43,24 @@ export const metadata = {
   },
 }
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  const session = await getServerSession()
-
   return (
-    <html lang="en">
-      <body className={inter.className}>
-        <SessionProvider session={session}>
+    <html lang="en" className="scroll-smooth">
+      <body className="min-h-screen bg-cream-50 relative">
+        {/* Book spine background */}
+        <div className="fixed inset-0 book-spine-bg opacity-5 pointer-events-none" />
+        
+        {/* Paper texture overlay */}
+        <div className="fixed inset-0 bg-paper-texture pointer-events-none" />
+        
+        {/* Main content */}
+        <div className="relative z-10">
           {children}
-        </SessionProvider>
+        </div>
       </body>
     </html>
   )

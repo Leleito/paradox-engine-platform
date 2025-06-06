@@ -8,69 +8,75 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // Exact colors from the user's color palette
-        'palette-light': '#C1BCB9',      // Light grayish tone
-        'palette-medium': '#A09790',     // Medium gray-brown
-        'palette-dark': '#3D392E',       // Dark brown/charcoal
-        'palette-warm': '#C88C5A',       // Warm brown/tan
-        'palette-deepest': '#181510',    // Very dark brown/black
-        
-        // Updated burgundy scale using palette colors
+        // Book Cover Burgundy Palette
         burgundy: {
-          50: '#F8F7F6',
-          100: '#C1BCB9',   // Light tone from palette
-          200: '#A09790',   // Medium tone from palette
-          300: '#8B7E73',
-          400: '#756B5E',
-          500: '#5F5449',
-          600: '#4A3D34',
-          700: '#3D392E',   // Dark tone from palette
-          800: '#2A241C',
-          900: '#181510',   // Deepest tone from palette
+          50: '#fdf2f2',
+          100: '#fce4e4',
+          200: '#facaca',
+          300: '#f5a3a3',
+          400: '#ed6d6d',
+          500: '#e24444',
+          600: '#ce2626',
+          700: '#ac1d1d',
+          800: '#6e3737', // Primary book cover color
+          900: '#5a2e2e',
+          950: '#311414',
         },
+        // Gold Accents
+        gold: {
+          50: '#fdfcf8',
+          100: '#fbf8e8',
+          200: '#f6edc7',
+          300: '#f0dfa0',
+          400: '#e8c96d',
+          500: '#d4af37', // Primary gold
+          600: '#c49a2e',
+          700: '#a37e27',
+          800: '#846525',
+          900: '#6e5422',
+        },
+        // Cream/Paper Colors
         cream: {
-          50: '#FEFDFB',
-          100: '#C1BCB9',   // Using palette light tone
-          200: '#B8B2AE',
-          300: '#AFA79F',
-          400: '#A09790',   // Using palette medium tone
-          500: '#8F8479',
-          600: '#7E7164',
-          700: '#6D5E4F',
-          800: '#C88C5A',   // Using palette warm tone
-          900: '#5C4B3A',
+          50: '#fdfcfb',
+          100: '#faf8f5',
+          200: '#f5f0e8',
+          300: '#ede4d3',
+          400: '#e0d0b8',
+          500: '#d4b896',
+          600: '#c49f74',
+          700: '#a8845d',
+          800: '#8a6b4d',
+          900: '#735841',
         },
-        silhouette: {
-          light: '#C1BCB9',  // Light tone from palette
-          dark: '#3D392E',   // Dark tone from palette
-        }
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
-        serif: ['Playfair Display', 'Georgia', 'serif'],
+        'display': ['Playfair Display', 'Georgia', 'serif'],
+        'serif': ['Crimson Text', 'Georgia', 'serif'],
+        'sans': ['Inter', 'system-ui', 'sans-serif'],
       },
       backgroundImage: {
-        'maze-pattern': `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23A09790' fill-opacity='0.08'%3E%3Cpath d='M30 0v30h30V0H30zm15 15v15h15V15H45zM0 30v30h30V30H0zm15 15v15h15V30H15z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-        'book-gradient': 'linear-gradient(135deg, #C1BCB9 0%, #A09790 100%)',
-        'burgundy-gradient': 'linear-gradient(135deg, #3D392E 0%, #181510 100%)',
-        'silhouette-gradient': 'linear-gradient(45deg, #C1BCB9 0%, #3D392E 100%)',
-        'palette-gradient': 'linear-gradient(135deg, #C88C5A 0%, #A09790 50%, #3D392E 100%)',
-      },
-      animation: {
-        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-        'float': 'float 6s ease-in-out infinite',
-      },
-      keyframes: {
-        float: {
-          '0%, 100%': { transform: 'translateY(0px)' },
-          '50%': { transform: 'translateY(-10px)' },
-        }
+        'book-spine': 'linear-gradient(135deg, #6e3737 0%, #5a2e2e 50%, #6e3737 100%)',
+        'paper-texture': 'radial-gradient(circle at 20% 80%, rgba(212, 175, 55, 0.05) 0%, transparent 50%)',
       },
       boxShadow: {
-        'book': '0 10px 25px -5px rgba(24, 21, 16, 0.3), 0 4px 6px -2px rgba(24, 21, 16, 0.1)',
-        'book-hover': '0 20px 35px -5px rgba(24, 21, 16, 0.4), 0 8px 10px -2px rgba(24, 21, 16, 0.2)',
-        'palette': '0 10px 25px -5px rgba(61, 57, 46, 0.3), 0 4px 6px -2px rgba(61, 57, 46, 0.1)',
-      }
+        'book': '0 4px 20px rgba(110, 55, 55, 0.15), 0 8px 32px rgba(110, 55, 55, 0.1)',
+        'book-hover': '0 8px 30px rgba(110, 55, 55, 0.2), 0 12px 40px rgba(110, 55, 55, 0.15)',
+        'gold': '0 4px 20px rgba(212, 175, 55, 0.2)',
+      },
+      animation: {
+        'page-turn': 'pageTurn 0.6s ease-in-out',
+        'gold-shimmer': 'goldShimmer 3s ease-in-out infinite',
+      },
+      keyframes: {
+        pageTurn: {
+          '0%': { transform: 'rotateY(0deg)' },
+          '100%': { transform: 'rotateY(-20deg)' },
+        },
+        goldShimmer: {
+          '0%, 100%': { opacity: '0.5' },
+          '50%': { opacity: '1' },
+        },
+      },
     },
   },
   plugins: [],
