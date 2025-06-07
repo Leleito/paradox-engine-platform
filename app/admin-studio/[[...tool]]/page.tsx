@@ -60,7 +60,7 @@ export default function StudioPage() {
     return <StudioError error="Missing NEXT_PUBLIC_SANITY_PROJECT_ID in environment variables" />
   }
 
-  if (!dataset || dataset === 'production' && !projectId) {
+  if (!dataset) {
     return <StudioError error="Missing NEXT_PUBLIC_SANITY_DATASET in environment variables" />
   }
 

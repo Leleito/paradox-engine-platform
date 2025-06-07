@@ -33,13 +33,13 @@ const nextConfig = {
     async redirects() {
       return [
         {
-          source: '/Studio',
-          destination: '/studio',
+          source: '/studio',
+          destination: '/admin-studio',
           permanent: true,
         },
         {
-          source: '/studio/',
-          destination: '/studio',
+          source: '/Studio',
+          destination: '/admin-studio',
           permanent: true,
         },
         {

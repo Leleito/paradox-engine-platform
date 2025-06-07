@@ -21,12 +21,36 @@ declare module 'next-auth/jwt' {
   }
 }
 
+// Environment validation
+const validateEnvironment = () => {
+  const requiredEnvVars = {
+    NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
+    NEXTAUTH_URL: process.env.NEXTAUTH_URL
+  }
+
+  for (const [key, value] of Object.entries(requiredEnvVars)) {
+    if (!value) {
+      console.warn(`⚠️  Missing required environment variable: ${key}`)
+    }
+  }
+
+  // Check Google OAuth configuration
+  const hasGoogleCredentials = process.env.GOOGLE_CLIENT_ID && 
+                               process.env.GOOGLE_CLIENT_SECRET &&
+                               process.env.GOOGLE_CLIENT_ID !== 'development-client-id'
+
+  return {
+    hasGoogleCredentials,
+    isProduction: process.env.NODE_ENV === 'production'
+  }
+}
+
 // Admin users list
 const ADMIN_EMAILS = [
   'thomas@paradox-engine.com',
   'admin@paradox-engine.com',
   'pe@laitigosystems.com',
-  process.env.ADMIN_EMAIL || 'default@admin.com'
+  process.env.ADMIN_EMAIL || 'gleleito@gmail.com'
 ]
 
 // Admin credentials for demo (replace with database)
@@ -41,20 +65,39 @@ const ADMIN_CREDENTIALS = [
   }
 ]
 
+// Validate environment on startup
+const { hasGoogleCredentials } = validateEnvironment()
+
 export const authOptions: NextAuthOptions = {
   providers: [
-    GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID || '',
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
-      authorization: {
-        params: {
-          scope: 'openid email profile',
-          prompt: 'consent',
-          access_type: 'offline',
-          response_type: 'code'
+    // Only include Google provider if proper credentials are available
+    ...(hasGoogleCredentials ? [
+      GoogleProvider({
+        clientId: process.env.GOOGLE_CLIENT_ID!,
+        clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+        authorization: {
+          params: {
+            // Latest Google OAuth 2.0 parameters
+            scope: 'openid email profile',
+            prompt: 'consent',
+            access_type: 'offline',
+            response_type: 'code',
+            include_granted_scopes: true
+          }
+        },
+        // Handle profile mapping with latest structure
+        profile(profile) {
+          return {
+            id: profile.sub,
+            name: profile.name,
+            email: profile.email,
+            image: profile.picture,
+            role: ADMIN_EMAILS.includes(profile.email) ? 'admin' : 'user'
+          }
         }
-      }
-    }),
+      })
+    ] : []),
+    
     CredentialsProvider({
       name: 'credentials',
       credentials: {
@@ -84,35 +127,88 @@ export const authOptions: NextAuthOptions = {
     })
   ],
   callbacks: {
-    async signIn({ user, account }) {
+    async signIn({ user, account, profile }) {
+      // Enhanced signin callback with better logging
+      console.log('📝 Sign-in attempt:', {
+        provider: account?.provider,
+        email: user?.email,
+        hasProfile: !!profile
+      })
+
       // Allow ALL Google OAuth users (subscribers + admins)
       if (account?.provider === 'google') {
-        return true  // ✅ Allow all Google users for subscription platform
+        // Additional validation for Google users
+        if (!user?.email) {
+          console.error('❌ Google sign-in failed: No email provided')
+          return false
+        }
+        
+        console.log('✅ Google sign-in successful:', user.email)
+        return true
       }
+      
+      // Allow credential-based admin login
+      if (account?.provider === 'credentials') {
+        return true
+      }
+      
       return true
     },
-    async jwt({ token, user }) {
+    async jwt({ token, user, account }) {
+      // Enhanced JWT callback with role assignment
       if (user) {
         token.role = ADMIN_EMAILS.includes(user.email || '') ? 'admin' : 'user'
+        token.provider = account?.provider
+        
+        console.log('🎫 JWT created:', {
+          email: user.email,
+          role: token.role,
+          provider: account?.provider
+        })
       }
       return token
     },
     async session({ session, token }) {
+      // Enhanced session callback
       if (session.user && token) {
         session.user.role = token.role
         session.user.id = token.sub
+        
+        // Add provider info for debugging
+        if (process.env.NODE_ENV === 'development') {
+          (session as any).provider = token.provider
+        }
       }
       return session
+    },
+    async redirect({ url, baseUrl }) {
+      // Enhanced redirect handling for OAuth flow
+      console.log('🔄 Redirect:', { url, baseUrl })
+      
+      // Allows relative callback URLs
+      if (url.startsWith("/")) return `${baseUrl}${url}`
+      
+      // Allows callback URLs on the same origin
+      if (new URL(url).origin === baseUrl) return url
+      
+      // Default redirect to dashboard
+      return `${baseUrl}/dashboard`
     }
   },
-  // Removed custom pages to prevent redirect loops
-  // pages: {
-  //   signIn: '/admin/login',
-  //   error: '/admin/error'
-  // },
+  pages: {
+    // Custom pages for better user experience
+    signIn: '/signup',
+    error: '/signup',
+    signOut: '/'
+  },
   session: {
     strategy: 'jwt',
     maxAge: 24 * 60 * 60 // 24 hours
   },
-  secret: process.env.NEXTAUTH_SECRET
-} 
+  secret: process.env.NEXTAUTH_SECRET,
+  // Enhanced debugging for development
+  debug: process.env.NODE_ENV === 'development'
+}
+
+// Export validation function for use in components
+export { validateEnvironment } 

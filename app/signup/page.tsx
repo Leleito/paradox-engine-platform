@@ -1,48 +1,93 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { signIn, getSession } from 'next-auth/react'
+import { signIn, getSession, getProviders } from 'next-auth/react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { motion } from 'framer-motion'
+
+interface Provider {
+  id: string
+  name: string
+  type: string
+}
+
+interface Providers {
+  [key: string]: Provider
+}
 
 export default function SignupPage() {
   const [email, setEmail] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [isGoogleLoading, setIsGoogleLoading] = useState(false)
   const [message, setMessage] = useState('')
-  const [googleEnabled, setGoogleEnabled] = useState(true)
+  const [providers, setProviders] = useState<Providers | null>(null)
+  const [hasGoogleProvider, setHasGoogleProvider] = useState(false)
   const router = useRouter()
   const searchParams = useSearchParams()
   const callbackUrl = searchParams.get('callbackUrl') || '/dashboard'
+  const error = searchParams.get('error')
 
   useEffect(() => {
     // Check if user is already signed in
     getSession().then((session) => {
       if (session) {
+        console.log('✅ User already signed in, redirecting to:', callbackUrl)
         router.push(callbackUrl)
       }
     })
 
-    // Check if Google OAuth is properly configured
-    checkGoogleConfig()
-  }, [router, callbackUrl])
+    // Load available authentication providers
+    loadProviders()
+    
+    // Handle OAuth errors from URL parameters
+    handleOAuthErrors()
+  }, [router, callbackUrl, error])
 
-  const checkGoogleConfig = async () => {
+  const loadProviders = async () => {
     try {
-      const response = await fetch('/api/auth/providers')
-      const providers = await response.json()
-      setGoogleEnabled(!!providers.google)
+      console.log('🔍 Loading authentication providers...')
+      const authProviders = await getProviders()
+      console.log('📋 Available providers:', authProviders)
+      
+      setProviders(authProviders)
+      setHasGoogleProvider(!!(authProviders?.google))
+      
+      if (authProviders?.google) {
+        console.log('✅ Google OAuth provider available')
+      } else {
+        console.log('⚠️  Google OAuth provider not configured')
+      }
     } catch (error) {
-      console.error('Error checking providers:', error)
-      setGoogleEnabled(false)
+      console.error('❌ Error loading providers:', error)
+      setHasGoogleProvider(false)
+    }
+  }
+
+  const handleOAuthErrors = () => {
+    if (error) {
+      console.error('🚨 OAuth Error detected:', error)
+      
+      const errorMessages: { [key: string]: string } = {
+        'OAuthSignin': 'Error occurred during Google sign-in. Please try again.',
+        'OAuthCallback': 'Error in OAuth callback. Please try again.',
+        'OAuthCreateAccount': 'Could not create account. Please try again.',
+        'EmailCreateAccount': 'Could not create account with email. Please try again.',
+        'Callback': 'Error in authentication callback. Please try again.',
+        'OAuthAccountNotLinked': 'Email already exists with different provider. Please use email signup.',
+        'EmailSignin': 'Check your email for sign-in link.',
+        'CredentialsSignin': 'Invalid credentials. Please check email and password.',
+        'SessionRequired': 'Please sign in to access this page.'
+      }
+      
+      setMessage(errorMessages[error] || 'Authentication error occurred. Please try again.')
     }
   }
 
   const handleGoogleSignIn = async () => {
-    if (!googleEnabled) {
-      setMessage('Google sign-in is currently unavailable. Please use email signup.')
+    if (!hasGoogleProvider) {
+      setMessage('Google sign-in is currently being configured. Please use email signup.')
       return
     }
 
@@ -50,26 +95,23 @@ export default function SignupPage() {
     setMessage('')
     
     try {
-      console.log('Attempting Google sign-in...')
+      console.log('🚀 Initiating Google OAuth flow...')
+      console.log('📍 Callback URL:', callbackUrl)
+      
+      // Use the latest NextAuth signIn method with enhanced parameters
       const result = await signIn('google', {
-        callbackUrl,
-        redirect: false
+        callbackUrl: callbackUrl,
+        redirect: true // Let NextAuth handle the redirect
       })
       
-      console.log('Google sign-in result:', result)
+      console.log('📊 Google OAuth result:', result)
       
-      if (result?.error) {
-        console.error('Google sign-in error:', result.error)
-        setMessage('Google sign-in failed. Please try email signup instead.')
-      } else if (result?.url) {
-        console.log('Redirecting to:', result.url)
-        window.location.href = result.url
-      } else {
-        setMessage('Please check your popup blocker and try again.')
-      }
+      // Note: With redirect: true, this code might not execute
+      // as the user will be redirected to Google's OAuth page
+      
     } catch (error) {
-      console.error('Google sign-in exception:', error)
-      setMessage('Google sign-in is currently unavailable. Please use email signup.')
+      console.error('❌ Google OAuth error:', error)
+      setMessage('Google sign-in encountered an error. Please try email signup instead.')
     } finally {
       setIsGoogleLoading(false)
     }
@@ -81,14 +123,23 @@ export default function SignupPage() {
     setMessage('')
 
     try {
-      // First subscribe to the platform
+      console.log('📧 Processing email signup for:', email)
+      
+      // Subscribe to the platform
       const subscribeResponse = await fetch('/api/subscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, type: 'platform-signup' })
+        body: JSON.stringify({ 
+          email, 
+          type: 'platform-signup',
+          source: 'signup-page'
+        })
       })
 
       if (subscribeResponse.ok) {
+        const result = await subscribeResponse.json()
+        console.log('✅ Email signup successful:', result)
+        
         setMessage('Welcome! Check your email for access instructions.')
         setEmail('')
         
@@ -97,9 +148,12 @@ export default function SignupPage() {
           router.push(callbackUrl)
         }, 2000)
       } else {
+        const errorData = await subscribeResponse.text()
+        console.error('❌ Email signup failed:', errorData)
         setMessage('Something went wrong. Please try again.')
       }
     } catch (error) {
+      console.error('❌ Email signup error:', error)
       setMessage('Something went wrong. Please try again.')
     } finally {
       setIsLoading(false)
@@ -166,8 +220,8 @@ export default function SignupPage() {
               </div>
             </div>
 
-            {/* Enhanced Google Sign In with Better Error Handling */}
-            {googleEnabled && (
+            {/* Latest Google OAuth Implementation */}
+            {hasGoogleProvider && (
               <div className="mb-8">
                 <motion.button
                   onClick={handleGoogleSignIn}
@@ -176,46 +230,70 @@ export default function SignupPage() {
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                 >
-                  {/* Hover effect background */}
+                  {/* Enhanced hover effect */}
                   <div className="absolute inset-0 bg-gradient-to-r from-gold-500/5 to-burgundy-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   
+                  {/* Google Icon */}
                   <svg className="w-6 h-6 relative z-10" viewBox="0 0 24 24">
                     <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
                     <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
                     <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
                     <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
                   </svg>
+                  
                   <span className="text-burgundy-800 font-medium text-lg group-hover:text-burgundy-900 transition-colors relative z-10">
                     {isGoogleLoading ? (
                       <span className="flex items-center gap-2">
                         <div className="w-4 h-4 border-2 border-burgundy-600 border-t-transparent rounded-full animate-spin" />
-                        Signing in...
+                        Connecting to Google...
                       </span>
                     ) : (
-                      'Sign in with Google'
+                      'Continue with Google'
                     )}
                   </span>
                 </motion.button>
+                
+                {/* Security badge for Google OAuth */}
+                <div className="mt-2 flex items-center justify-center gap-1 text-xs text-burgundy-600 font-serif">
+                  <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 1L5 4v5.5c0 3.45 2.11 6.78 5 8.5 2.89-1.72 5-5.05 5-8.5V4l-5-3z" clipRule="evenodd"/>
+                  </svg>
+                  <span>Secured by Google OAuth 2.0</span>
+                </div>
+              </div>
+            )}
+
+            {/* Provider status indicator (development only) */}
+            {process.env.NODE_ENV === 'development' && (
+              <div className="mb-4 p-2 bg-burgundy-50 border border-burgundy-200 rounded text-xs">
+                <div className={`font-serif ${hasGoogleProvider ? 'text-green-700' : 'text-yellow-700'}`}>
+                  {hasGoogleProvider ? '✅ Google OAuth Ready' : '⚠️ Google OAuth Not Configured'}
+                </div>
+                {providers && (
+                  <div className="text-burgundy-600 mt-1">
+                    Providers: {Object.keys(providers).join(', ') || 'None'}
+                  </div>
+                )}
               </div>
             )}
 
             {/* Fallback message when Google is disabled */}
-            {!googleEnabled && (
+            {!hasGoogleProvider && (
               <div className="mb-6 p-3 bg-burgundy-50 border border-burgundy-200 rounded-lg">
                 <p className="text-sm text-burgundy-700 font-serif">
-                  Google sign-in is currently being configured. Please use email signup below.
+                  Google sign-in is being configured. Email signup works perfectly!
                 </p>
               </div>
             )}
 
-            {/* Simplified Email Signup Option */}
+            {/* Divider */}
             <div className="relative mb-6">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-burgundy-200"></div>
               </div>
               <div className="relative flex justify-center text-sm">
                 <span className="px-4 bg-cream-50 text-burgundy-600 font-serif">
-                  {googleEnabled ? 'Quick email signup' : 'Join with email'}
+                  {hasGoogleProvider ? 'Or continue with email' : 'Join with email'}
                 </span>
               </div>
             </div>
@@ -258,9 +336,11 @@ export default function SignupPage() {
                 className={`mt-4 p-3 rounded-lg text-sm font-serif ${
                   message.includes('Welcome') || message.includes('Check your email')
                     ? 'bg-green-50 text-green-800 border border-green-200'
-                    : message.includes('unavailable') || message.includes('failed')
-                    ? 'bg-yellow-50 text-yellow-800 border border-yellow-200'
-                    : 'bg-red-50 text-red-800 border border-red-200'
+                    : message.includes('being configured') || message.includes('email signup')
+                    ? 'bg-blue-50 text-blue-800 border border-blue-200'
+                    : message.includes('Error') || message.includes('error')
+                    ? 'bg-red-50 text-red-800 border border-red-200'
+                    : 'bg-yellow-50 text-yellow-800 border border-yellow-200'
                 }`}
               >
                 {message}
@@ -272,9 +352,9 @@ export default function SignupPage() {
               <p>
                 By signing up, you agree to receive transformational insights and updates.
               </p>
-              {googleEnabled && (
+              {hasGoogleProvider && (
                 <p>
-                  Already have a Google account? Just click "Sign in with Google" above.
+                  Have a Google account? Use "Continue with Google" for instant access.
                 </p>
               )}
               <p className="text-center text-gold-600">
