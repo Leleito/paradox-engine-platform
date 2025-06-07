@@ -24,55 +24,37 @@ export default {
       name: 'content',
       title: 'Feedback Content',
       type: 'text',
-      rows: 4,
       validation: (Rule: any) => Rule.required().min(10).max(2000)
     },
     {
-      name: 'relatedArticle',
-      title: 'Related Article',
-      type: 'reference',
-      to: [{ type: 'article' }, { type: 'bookContent' }],
-      description: 'Link to article if this is a comment'
+      name: 'userEmail',
+      title: 'User Email',
+      type: 'string',
+      validation: (Rule: any) => Rule.required().email()
     },
     {
-      name: 'userInfo',
-      title: 'User Information',
-      type: 'object',
-      fields: [
-        {
-          name: 'name',
-          title: 'Name',
-          type: 'string',
-          validation: (Rule: any) => Rule.required()
-        },
-        {
-          name: 'email',
-          title: 'Email',
-          type: 'string',
-          validation: (Rule: any) => Rule.required().email()
-        },
-        {
-          name: 'userId',
-          title: 'User ID',
-          type: 'string',
-          description: 'System user ID if authenticated'
-        }
-      ]
+      name: 'userName',
+      title: 'User Name',
+      type: 'string',
+      validation: (Rule: any) => Rule.required()
+    },
+    {
+      name: 'userId',
+      title: 'User ID',
+      type: 'string',
+      description: 'Optional user ID if logged in'
     },
     {
       name: 'rating',
-      title: 'Rating',
+      title: 'Rating (1-5)',
       type: 'number',
-      options: {
-        list: [
-          { title: '⭐ 1 Star', value: 1 },
-          { title: '⭐⭐ 2 Stars', value: 2 },
-          { title: '⭐⭐⭐ 3 Stars', value: 3 },
-          { title: '⭐⭐⭐⭐ 4 Stars', value: 4 },
-          { title: '⭐⭐⭐⭐⭐ 5 Stars', value: 5 }
-        ]
-      },
-      description: 'Optional rating for content or platform'
+      validation: (Rule: any) => Rule.min(1).max(5)
+    },
+    {
+      name: 'relatedArticle',
+      title: 'Related Article Slug',
+      type: 'string',
+      description: 'Article slug this feedback relates to (if applicable)'
     },
     {
       name: 'status',
@@ -80,38 +62,15 @@ export default {
       type: 'string',
       options: {
         list: [
-          { title: '🆕 New', value: 'new' },
-          { title: '👀 Under Review', value: 'reviewing' },
-          { title: '✅ Approved', value: 'approved' },
-          { title: '📝 Needs Response', value: 'pending' },
-          { title: '✔️ Responded', value: 'responded' },
-          { title: '🗑️ Spam/Rejected', value: 'rejected' }
+          { title: 'New', value: 'new' },
+          { title: 'Reviewing', value: 'reviewing' },
+          { title: 'Approved', value: 'approved' },
+          { title: 'Pending', value: 'pending' },
+          { title: 'Responded', value: 'responded' },
+          { title: 'Rejected', value: 'rejected' }
         ]
       },
       initialValue: 'new'
-    },
-    {
-      name: 'adminResponse',
-      title: 'Admin Response',
-      type: 'object',
-      fields: [
-        {
-          name: 'message',
-          title: 'Response Message',
-          type: 'text',
-          rows: 3
-        },
-        {
-          name: 'respondedBy',
-          title: 'Responded By',
-          type: 'string'
-        },
-        {
-          name: 'respondedAt',
-          title: 'Response Date',
-          type: 'datetime'
-        }
-      ]
     },
     {
       name: 'priority',
@@ -119,76 +78,77 @@ export default {
       type: 'string',
       options: {
         list: [
-          { title: '🔴 High', value: 'high' },
-          { title: '🟡 Medium', value: 'medium' },
-          { title: '🟢 Low', value: 'low' }
+          { title: 'High', value: 'high' },
+          { title: 'Medium', value: 'medium' },
+          { title: 'Low', value: 'low' }
         ]
       },
       initialValue: 'medium'
     },
     {
       name: 'tags',
-      title: 'Tags',
-      type: 'array',
-      of: [{ type: 'string' }],
-      options: {
-        layout: 'tags'
-      },
-      description: 'Tags for categorizing feedback'
+      title: 'Tags (comma separated)',
+      type: 'text',
+      description: 'Relevant tags for categorization'
     },
     {
-      name: 'metadata',
-      title: 'Metadata',
-      type: 'object',
-      fields: [
-        {
-          name: 'userAgent',
-          title: 'User Agent',
-          type: 'string'
-        },
-        {
-          name: 'ipAddress',
-          title: 'IP Address',
-          type: 'string'
-        },
-        {
-          name: 'pageUrl',
-          title: 'Page URL',
-          type: 'string'
-        },
-        {
-          name: 'sessionId',
-          title: 'Session ID',
-          type: 'string'
-        }
-      ]
+      name: 'adminNotes',
+      title: 'Admin Notes',
+      type: 'text',
+      description: 'Internal notes for admin use'
+    },
+    {
+      name: 'response',
+      title: 'Admin Response',
+      type: 'text',
+      description: 'Response to send to user'
+    },
+    {
+      name: 'userAgent',
+      title: 'User Agent',
+      type: 'string',
+      description: 'Browser/device information'
+    },
+    {
+      name: 'ipAddress',
+      title: 'IP Address',
+      type: 'string',
+      description: 'User IP address'
+    },
+    {
+      name: 'pageUrl',
+      title: 'Page URL',
+      type: 'url',
+      description: 'URL where feedback was submitted'
+    },
+    {
+      name: 'sessionId',
+      title: 'Session ID',
+      type: 'string',
+      description: 'User session identifier'
     },
     {
       name: 'submittedAt',
-      title: 'Submitted Date',
+      title: 'Submitted At',
       type: 'datetime',
-      initialValue: () => new Date().toISOString(),
       validation: (Rule: any) => Rule.required()
     },
     {
-      name: 'isPublic',
-      title: 'Display Publicly',
-      type: 'boolean',
-      description: 'Show this feedback/comment publicly on the platform',
-      initialValue: false
+      name: 'respondedAt',
+      title: 'Responded At',
+      type: 'datetime',
+      description: 'When admin responded to this feedback'
     }
   ],
   preview: {
     select: {
-      type: 'type',
-      content: 'content',
-      name: 'userInfo.name',
-      status: 'status',
-      priority: 'priority',
-      submittedAt: 'submittedAt'
+      title: 'content',
+      subtitle: 'type',
+      description: 'status',
+      priority: 'priority'
     },
     prepare(selection: any) {
-      const { type, content, name, status, priority, submittedAt } = selection
+      const { title, subtitle, description, priority } = selection
       
       const statusIcon = {
         'new': '🆕',
@@ -197,7 +157,7 @@ export default {
         'pending': '📝',
         'responded': '✔️',
         'rejected': '🗑️'
-      }[status as string] || '📝'
+      }[description as string] || '📝'
       
       const priorityIcon = {
         'high': '🔴',
@@ -212,26 +172,24 @@ export default {
         'bug': 'Bug',
         'feature': 'Feature',
         'inquiry': 'Inquiry'
-      }[type as string] || 'Feedback'
-      
-      const date = submittedAt ? new Date(submittedAt).toLocaleDateString() : ''
-      const preview = content ? content.substring(0, 60) + '...' : ''
+      }[subtitle as string] || 'Feedback'
       
       return {
-        title: `${statusIcon} ${typeLabel} from ${name || 'Anonymous'}`,
-        subtitle: `${priorityIcon} ${date} • ${preview}`,
-        media: statusIcon
+        title: title ? title.substring(0, 60) + '...' : 'No content',
+        subtitle: `${priorityIcon} ${typeLabel}`,
+        description: `${statusIcon} ${description || 'new'}`,
+        media: () => '💬'
       }
     }
   },
   orderings: [
     {
       title: 'Newest First',
-      name: 'submittedAtDesc',
+      name: 'submittedDesc',
       by: [{ field: 'submittedAt', direction: 'desc' }]
     },
     {
-      title: 'Priority',
+      title: 'Priority (High to Low)',
       name: 'priorityDesc',
       by: [
         { field: 'priority', direction: 'desc' },

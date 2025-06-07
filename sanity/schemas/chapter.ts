@@ -36,69 +36,8 @@ export default {
     {
       name: 'content',
       title: 'Chapter Content',
-      type: 'array',
-      of: [
-        {
-          type: 'block',
-          styles: [
-            { title: 'Normal', value: 'normal' },
-            { title: 'H1', value: 'h1' },
-            { title: 'H2', value: 'h2' },
-            { title: 'H3', value: 'h3' },
-            { title: 'Quote', value: 'blockquote' }
-          ],
-          marks: {
-            decorators: [
-              { title: 'Strong', value: 'strong' },
-              { title: 'Emphasis', value: 'em' },
-              { title: 'Code', value: 'code' }
-            ],
-            annotations: [
-              {
-                name: 'link',
-                type: 'object',
-                title: 'Link',
-                fields: [
-                  {
-                    name: 'href',
-                    type: 'url',
-                    title: 'URL'
-                  }
-                ]
-              }
-            ]
-          }
-        },
-        {
-          type: 'image',
-          options: { hotspot: true }
-        },
-        {
-          type: 'object',
-          name: 'callout',
-          title: 'Callout Box',
-          fields: [
-            {
-              name: 'type',
-              type: 'string',
-              title: 'Type',
-              options: {
-                list: [
-                  { title: 'Info', value: 'info' },
-                  { title: 'Warning', value: 'warning' },
-                  { title: 'Success', value: 'success' },
-                  { title: 'Exercise', value: 'exercise' }
-                ]
-              }
-            },
-            {
-              name: 'content',
-              type: 'text',
-              title: 'Content'
-            }
-          ]
-        }
-      ]
+      type: 'text',
+      validation: (Rule: any) => Rule.required().min(100)
     },
     {
       name: 'coverImage',
@@ -130,12 +69,9 @@ export default {
     },
     {
       name: 'tags',
-      title: 'Tags',
-      type: 'array',
-      of: [{ type: 'string' }],
-      options: {
-        layout: 'tags'
-      }
+      title: 'Tags (comma separated)',
+      type: 'text',
+      description: 'Relevant tags separated by commas'
     },
     {
       name: 'published',
@@ -152,47 +88,15 @@ export default {
     },
     {
       name: 'exercises',
-      title: 'Chapter Exercises',
-      type: 'array',
-      of: [
-        {
-          type: 'object',
-          name: 'exercise',
-          title: 'Exercise',
-          fields: [
-            {
-              name: 'title',
-              type: 'string',
-              title: 'Exercise Title'
-            },
-            {
-              name: 'instructions',
-              type: 'text',
-              title: 'Instructions'
-            },
-            {
-              name: 'type',
-              type: 'string',
-              title: 'Exercise Type',
-              options: {
-                list: [
-                  'reflection',
-                  'writing',
-                  'practice',
-                  'discussion'
-                ]
-              }
-            }
-          ]
-        }
-      ]
+      title: 'Chapter Exercises (one per line)',
+      type: 'text',
+      description: 'List exercises one per line with format: Title | Instructions | Type'
     },
     {
       name: 'keyTakeaways',
-      title: 'Key Takeaways',
-      type: 'array',
-      of: [{ type: 'string' }],
-      description: 'Main points readers should remember'
+      title: 'Key Takeaways (one per line)',
+      type: 'text',
+      description: 'Main points readers should remember, one per line'
     }
   ],
   preview: {

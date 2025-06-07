@@ -29,10 +29,10 @@ export default {
           { title: 'Psychology & Self-Development', value: 'psychology' },
           { title: 'Philosophy & Paradox', value: 'philosophy' },
           { title: 'Science & Consciousness', value: 'science' },
-          { title: 'Relationships & Love', value: 'relationships' },
-          { title: 'Economics & Politics', value: 'economics' },
-          { title: 'Spirituality & Faith', value: 'spirituality' },
-          { title: 'Personal Growth', value: 'growth' },
+          { title: 'Business & Leadership', value: 'business' },
+          { title: 'Relationships & Sexuality', value: 'relationships' },
+          { title: 'Spirituality & Religion', value: 'spirituality' },
+          { title: 'Society & Culture', value: 'society' },
           { title: 'Paradox Engine Framework', value: 'framework' }
         ]
       },
@@ -42,83 +42,57 @@ export default {
       name: 'subcategory',
       title: 'Subcategory',
       type: 'string',
-      description: 'Optional subcategory for more specific organization'
+      description: 'Optional subcategory for more specific classification'
     },
     {
       name: 'excerpt',
-      title: 'Excerpt',
+      title: 'Excerpt/Preview',
       type: 'text',
-      rows: 3,
-      description: 'Brief summary for article previews',
       validation: (Rule: any) => Rule.required().max(300)
     },
     {
       name: 'content',
-      title: 'Content',
-      type: 'array',
-      of: [
-        {
-          type: 'block',
-          styles: [
-            { title: 'Normal', value: 'normal' },
-            { title: 'H1', value: 'h1' },
-            { title: 'H2', value: 'h2' },
-            { title: 'H3', value: 'h3' },
-            { title: 'H4', value: 'h4' },
-            { title: 'Quote', value: 'blockquote' }
-          ],
-          marks: {
-            decorators: [
-              { title: 'Strong', value: 'strong' },
-              { title: 'Emphasis', value: 'em' },
-              { title: 'Code', value: 'code' }
-            ],
-            annotations: [
-              {
-                title: 'URL',
-                name: 'link',
-                type: 'object',
-                fields: [
-                  {
-                    title: 'URL',
-                    name: 'href',
-                    type: 'url'
-                  }
-                ]
-              }
-            ]
-          }
-        },
-        {
-          type: 'image',
-          options: { hotspot: true }
-        }
-      ]
-    },
-    {
-      name: 'readingTime',
-      title: 'Reading Time (minutes)',
-      type: 'number',
-      description: 'Estimated reading time in minutes'
-    },
-    {
-      name: 'tags',
-      title: 'Tags',
-      type: 'array',
-      of: [{ type: 'string' }],
-      options: {
-        layout: 'tags'
-      }
+      title: 'Full Article Content',
+      type: 'text',
+      validation: (Rule: any) => Rule.required().min(100)
     },
     {
       name: 'author',
       title: 'Author',
-      type: 'reference',
-      to: [{ type: 'author' }],
-      initialValue: () => ({
-        _type: 'reference',
-        _ref: 'thomas-njeru' // Default to Thomas Njeru
-      })
+      type: 'string',
+      initialValue: 'Thomas Njeru'
+    },
+    {
+      name: 'readingTime',
+      title: 'Estimated Reading Time (minutes)',
+      type: 'number',
+      validation: (Rule: any) => Rule.required().min(1).max(60)
+    },
+    {
+      name: 'difficulty',
+      title: 'Difficulty Level',
+      type: 'string',
+      options: {
+        list: [
+          { title: 'Beginner', value: 'beginner' },
+          { title: 'Intermediate', value: 'intermediate' },
+          { title: 'Advanced', value: 'advanced' },
+          { title: 'Expert', value: 'expert' }
+        ]
+      },
+      initialValue: 'intermediate'
+    },
+    {
+      name: 'tags',
+      title: 'Tags (comma separated)',
+      type: 'text',
+      description: 'Relevant tags separated by commas'
+    },
+    {
+      name: 'featured',
+      title: 'Featured Article',
+      type: 'boolean',
+      initialValue: false
     },
     {
       name: 'publishedAt',
@@ -128,100 +102,81 @@ export default {
     },
     {
       name: 'status',
-      title: 'Status',
+      title: 'Publication Status',
       type: 'string',
       options: {
         list: [
           { title: 'Draft', value: 'draft' },
-          { title: 'Preview (Contents Tab)', value: 'preview' },
-          { title: 'Published', value: 'published' }
+          { title: 'Review', value: 'review' },
+          { title: 'Published', value: 'published' },
+          { title: 'Archived', value: 'archived' }
         ]
       },
-      initialValue: 'preview',
-      description: 'Preview status shows only in Contents tab as snippets'
+      initialValue: 'draft'
     },
     {
-      name: 'featured',
-      title: 'Featured Article',
-      type: 'boolean',
-      description: 'Show prominently in category lists'
-    },
-    {
-      name: 'seoTitle',
-      title: 'SEO Title',
-      type: 'string',
-      description: 'Optimized title for search engines'
+      name: 'relatedArticles',
+      title: 'Related Articles (comma separated slugs)',
+      type: 'text',
+      description: 'Slugs of related articles separated by commas'
     },
     {
       name: 'seoDescription',
-      title: 'SEO Description',
+      title: 'SEO Meta Description',
       type: 'text',
-      rows: 2,
-      description: 'Meta description for search engines'
+      validation: (Rule: any) => Rule.max(160)
     },
     {
-      name: 'paradoxElements',
-      title: 'Paradox Engine Elements',
-      type: 'object',
-      description: 'Framework elements present in this article',
-      fields: [
-        {
-          name: 'absurdity',
-          title: 'Contains Absurdity',
-          type: 'boolean'
-        },
-        {
-          name: 'duality',
-          title: 'Contains Duality',
-          type: 'boolean'
-        },
-        {
-          name: 'tension',
-          title: 'Contains Tension',
-          type: 'boolean'
-        },
-        {
-          name: 'rebellion',
-          title: 'Contains Rebellion',
-          type: 'boolean'
-        },
-        {
-          name: 'variety',
-          title: 'Contains Variety',
-          type: 'boolean'
-        }
-      ]
+      name: 'socialImageUrl',
+      title: 'Social Media Image URL',
+      type: 'url',
+      description: 'Image for social media sharing'
     }
   ],
   preview: {
     select: {
       title: 'title',
-      category: 'category',
-      status: 'status',
-      media: 'author.image'
+      subtitle: 'category',
+      description: 'status'
     },
     prepare(selection: any) {
-      const { title, category, status } = selection
-      const statusIcon = status === 'published' ? '✅' : status === 'preview' ? '👁️' : '📝'
-      const categoryName = category ? category.charAt(0).toUpperCase() + category.slice(1) : ''
+      const { title, subtitle, description } = selection
+      const statusIcon = {
+        'draft': '📝',
+        'review': '👀',
+        'published': '✅',
+        'archived': '📦'
+      }[description as string] || '📝'
+      
+      const categoryLabel = {
+        'psychology': 'Psychology',
+        'philosophy': 'Philosophy',
+        'science': 'Science',
+        'business': 'Business',
+        'relationships': 'Relationships',
+        'spirituality': 'Spirituality',
+        'society': 'Society',
+        'framework': 'Framework'
+      }[subtitle as string] || 'Article'
       
       return {
-        title,
-        subtitle: `${statusIcon} ${categoryName}`,
-        media: selection.media
+        title: title || 'Untitled Article',
+        subtitle: categoryLabel,
+        description: `${statusIcon} ${description || 'draft'}`,
+        media: () => '📝'
       }
     }
   },
   orderings: [
     {
-      title: 'Published Date, New',
-      name: 'publishedAtDesc',
+      title: 'Published Date (Newest)',
+      name: 'publishedDesc',
       by: [{ field: 'publishedAt', direction: 'desc' }]
     },
     {
-      title: 'Category',
-      name: 'categoryAsc',
-      by: [{ field: 'category', direction: 'asc' }]
+      title: 'Published Date (Oldest)',
+      name: 'publishedAsc',
+      by: [{ field: 'publishedAt', direction: 'asc' }]
     },
     {
       title: 'Title A-Z',
