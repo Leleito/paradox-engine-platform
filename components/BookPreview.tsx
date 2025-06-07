@@ -14,7 +14,7 @@ export default function BookPreview() {
   const [isLoading, setIsLoading] = useState(true)
 
   // Get user's subscription tier (you'll need to implement this based on your auth system)
-  const getUserTier = () => {
+  const getUserTier = (): 'free' | 'premium' | 'vip' => {
     // This is a placeholder - implement based on your subscription system
     if (!session) return 'free'
     // You might store tier in session or fetch from database
