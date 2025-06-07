@@ -18,15 +18,7 @@ export const bookSettings = defineType({
       type: 'image',
       options: {
         hotspot: true,
-      },
-      fields: [
-        {
-          name: 'alt',
-          title: 'Alt Text',
-          type: 'string',
-          validation: Rule => Rule.required()
-        }
-      ]
+      }
     }),
     defineField({
       name: 'bookTitle',
@@ -49,37 +41,19 @@ export const bookSettings = defineType({
     defineField({
       name: 'heroDescription',
       title: 'Hero Description',
-      type: 'text',
-      rows: 3
+      type: 'text'
     }),
     defineField({
       name: 'earlyAccessMessage',
       title: 'Early Access Message',
       type: 'text',
-      rows: 2,
       initialValue: 'Join our exclusive early adopter community and get advance access to transformational content.'
     }),
     defineField({
       name: 'signupBenefits',
-      title: 'Signup Benefits',
-      type: 'array',
-      of: [
-        {
-          type: 'object',
-          fields: [
-            {
-              name: 'benefit',
-              title: 'Benefit',
-              type: 'string'
-            },
-            {
-              name: 'icon',
-              title: 'Icon (emoji)',
-              type: 'string'
-            }
-          ]
-        }
-      ]
+      title: 'Signup Benefits (comma separated)',
+      type: 'text',
+      description: 'List benefits separated by commas'
     }),
     defineField({
       name: 'signupCtaText',
@@ -100,44 +74,16 @@ export const bookSettings = defineType({
       initialValue: 'Great work! Your response has been saved to your dashboard.'
     }),
     defineField({
-      name: 'socialProof',
-      title: 'Social Proof',
-      type: 'object',
-      fields: [
-        {
-          name: 'earlyAdopterCount',
-          title: 'Early Adopter Count',
-          type: 'number',
-          initialValue: 0
-        },
-        {
-          name: 'testimonials',
-          title: 'Testimonials',
-          type: 'array',
-          of: [
-            {
-              type: 'object',
-              fields: [
-                {
-                  name: 'text',
-                  title: 'Testimonial Text',
-                  type: 'text'
-                },
-                {
-                  name: 'author',
-                  title: 'Author Name',
-                  type: 'string'
-                },
-                {
-                  name: 'role',
-                  title: 'Author Role',
-                  type: 'string'
-                }
-              ]
-            }
-          ]
-        }
-      ]
+      name: 'earlyAdopterCount',
+      title: 'Early Adopter Count',
+      type: 'number',
+      initialValue: 0
+    }),
+    defineField({
+      name: 'testimonials',
+      title: 'Testimonials (JSON format)',
+      type: 'text',
+      description: 'Testimonials in JSON format (advanced editor coming soon)'
     }),
     defineField({
       name: 'footerTagline',
