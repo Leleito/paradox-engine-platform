@@ -1,14 +1,12 @@
+import DynamicHero from '@/components/DynamicHero'
 import Header from '@/components/Header'
-import Hero from '@/components/Hero'
-import Subscribe from '@/components/Subscribe'
 import Footer from '@/components/Footer'
 
-export default function Home() {
+export default function HomePage() {
   return (
     <main className="min-h-screen">
       <Header />
-      <Hero />
-      <Subscribe />
+      <DynamicHero />
       <Footer />
     </main>
   )

@@ -17,11 +17,11 @@ export default function Footer() {
                 <span className="text-burgundy-900 font-display font-bold text-lg">PE</span>
               </div>
               <span className="font-display text-xl text-cream-50">
-                Personal Evolution
+                Paradox Engine
               </span>
             </div>
             <p className="text-cream-200 text-sm font-serif">
-              Your journey to personal transformation begins here. 
+              Unlock life's paradoxes and transform challenges into opportunities. 
               Join our early adopter community for exclusive weekly insights.
             </p>
           </div>
@@ -36,8 +36,18 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/musings" className="text-cream-200 hover:text-gold-400 transition-colors text-sm font-serif">
-                  Musings
+                <Link href="/categories" className="text-cream-200 hover:text-gold-400 transition-colors text-sm font-serif">
+                  Categories
+                </Link>
+              </li>
+              <li>
+                <Link href="/content" className="text-cream-200 hover:text-gold-400 transition-colors text-sm font-serif">
+                  Content Library
+                </Link>
+              </li>
+              <li>
+                <Link href="/about" className="text-cream-200 hover:text-gold-400 transition-colors text-sm font-serif">
+                  About
                 </Link>
               </li>
               <li>
@@ -46,7 +56,7 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/subscribe" className="text-cream-200 hover:text-gold-400 transition-colors text-sm font-serif">
+                <Link href="/signup" className="text-cream-200 hover:text-gold-400 transition-colors text-sm font-serif">
                   Join Early Access
                 </Link>
               </li>
@@ -75,10 +85,10 @@ export default function Footer() {
         <div className="border-t border-burgundy-800 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-cream-300 text-sm font-serif">
-              © {currentYear} Personal Evolution. All rights reserved.
+              © {currentYear} Paradox Engine. All rights reserved.
             </p>
             <p className="text-cream-300 text-sm font-serif italic">
-              "Transform your story, evolve your life"
+              "Turn tension into triumph"
             </p>
           </div>
         </div>

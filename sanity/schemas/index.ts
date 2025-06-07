@@ -6,6 +6,9 @@ import siteSettings from './siteSettings'
 import testimonial from './testimonial'
 import subscriptionPlan from './subscriptionPlan'
 import cta from './cta'
+import { bookContent } from './bookContent'
+import { bookSettings } from './bookSettings'
+import { userProgress } from './userProgress'
 
 export const schemaTypes = [
   author,
@@ -15,5 +18,8 @@ export const schemaTypes = [
   siteSettings,
   testimonial,
   subscriptionPlan,
-  cta
+  cta,
+  bookContent,
+  bookSettings,
+  userProgress,
 ] 

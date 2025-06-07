@@ -178,4 +178,27 @@
   .text-gradient-burgundy {
     @apply bg-gradient-to-r from-burgundy-900 to-burgundy-700 bg-clip-text text-transparent;
   }
+
+  /* 3D Perspective utilities for book animations */
+  .perspective-1000 {
+    perspective: 1000px;
+  }
+
+  .perspective-500 {
+    perspective: 500px;
+  }
+
+  .transform-gpu {
+    transform: translateZ(0);
+  }
+
+  /* Smooth book hover effects */
+  .book-3d-hover {
+    transform-style: preserve-3d;
+    transition: transform 0.3s ease-out;
+  }
+
+  .book-3d-hover:hover {
+    transform: rotateY(-5deg) scale(1.05);
+  }
 }

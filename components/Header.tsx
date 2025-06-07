@@ -9,7 +9,9 @@ export default function Header() {
 
   const navItems = [
     { href: '/', label: 'Home' },
-    { href: '/musings', label: 'Musings' },
+    { href: '/categories', label: 'Categories' },
+    { href: '/content', label: 'Content' },
+    { href: '/about', label: 'About' },
     { href: '/dashboard', label: 'Dashboard' },
   ]
 
@@ -23,7 +25,7 @@ export default function Header() {
               <span className="text-gold-400 font-display font-bold text-lg">PE</span>
             </div>
             <span className="font-display text-xl text-burgundy-800 hidden sm:block">
-              Personal Evolution
+              Paradox Engine
             </span>
           </Link>
 
@@ -39,7 +41,7 @@ export default function Header() {
               </Link>
             ))}
             <Link
-              href="/subscribe"
+              href="/signup"
               className="btn-gold text-sm"
             >
               Join Early Access
@@ -92,7 +94,7 @@ export default function Header() {
                   </Link>
                 ))}
                 <Link
-                  href="/subscribe"
+                  href="/signup"
                   className="block mx-4 text-center btn-gold text-sm"
                   onClick={() => setIsMenuOpen(false)}
                 >

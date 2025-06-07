@@ -6,6 +6,8 @@ import Link from 'next/link'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { Clock, User, Calendar, ArrowLeft, Share2, BookOpen, Eye } from 'lucide-react'
+import ContentReader from '@/components/ContentReader'
+import { notFound } from 'next/navigation'
 
 // Sample blog posts data (in a real app, this would come from a CMS or database)
 const blogPosts = [
@@ -342,197 +344,28 @@ But more importantly, they've become someone who knows they can handle whatever 
   }
 ]
 
-export default function BlogPost() {
+export default function ArticlePage() {
   const params = useParams()
-  const slug = params?.slug as string
-  const [isShareOpen, setIsShareOpen] = useState(false)
-
-  // Find the blog post
-  const post = blogPosts.find(p => p.slug === slug)
-
-  if (!post) {
-    return (
-      <div className="min-h-screen bg-cream-50">
-        <Header />
-        <main className="py-20">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h1 className="text-4xl font-bold text-palette-deepest mb-4">Article Not Found</h1>
-            <p className="text-palette-dark mb-8">The article you're looking for doesn't exist or has been moved.</p>
-            <Link href="/musings" className="btn-primary">
-              ← Back to Musings
-            </Link>
-          </div>
-        </main>
-        <Footer />
-      </div>
-    )
-  }
-
-  // Share functionality
-  const shareUrl = typeof window !== 'undefined' ? window.location.href : ''
-  const shareText = `${post.title} by ${post.author}`
-
-  const handleShare = () => {
-    if (navigator.share) {
-      navigator.share({
-        title: post.title,
-        text: shareText,
-        url: shareUrl,
-      })
-    } else {
-      navigator.clipboard.writeText(shareUrl)
-      alert('Link copied to clipboard!')
-    }
+  const slug = params.slug as string
+  const article = blogPosts.find(a => a.slug === slug)
+  
+  if (!article) {
+    notFound()
   }
 
   return (
-    <div className="min-h-screen bg-cream-50">
+    <main className="min-h-screen">
       <Header />
-      
-      <main className="py-12">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Back Navigation */}
-          <div className="mb-8">
-            <Link 
-              href="/musings"
-              className="inline-flex items-center text-palette-warm hover:text-palette-deepest transition-colors"
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Musings
-            </Link>
-          </div>
-
-          {/* Article Header */}
-          <article className="card p-8 mb-8">
-            {/* Premium Badge */}
-            {post.isPremium && (
-              <div className="inline-flex items-center gap-2 bg-gradient-to-r from-burgundy-600 to-burgundy-700 text-white px-3 py-1 rounded-full text-sm font-medium mb-6">
-                <Eye className="w-4 h-4" />
-                Premium Content
-              </div>
-            )}
-
-            {/* Title */}
-            <h1 className="text-4xl md:text-5xl font-bold text-palette-deepest mb-4 font-serif">
-              {post.title}
-            </h1>
-
-            {/* Excerpt */}
-            <p className="text-xl text-palette-dark mb-8 leading-relaxed">
-              {post.excerpt}
-            </p>
-
-            {/* Meta Information */}
-            <div className="flex flex-wrap items-center gap-6 mb-8 text-sm text-palette-dark">
-              <div className="flex items-center gap-2">
-                <User className="w-4 h-4" />
-                {post.author}
-              </div>
-              <div className="flex items-center gap-2">
-                <Calendar className="w-4 h-4" />
-                {new Date(post.publishedAt).toLocaleDateString('en-US', {
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric'
-                })}
-              </div>
-              <div className="flex items-center gap-2">
-                <Clock className="w-4 h-4" />
-                {post.readTime}
-              </div>
-              <div className="flex items-center gap-2">
-                <BookOpen className="w-4 h-4" />
-                {post.category}
-              </div>
-            </div>
-
-            {/* Tags */}
-            <div className="flex flex-wrap gap-2 mb-8">
-              {post.tags.map((tag, index) => (
-                <span 
-                  key={index}
-                  className="bg-cream-100 text-palette-dark px-3 py-1 rounded-full text-sm"
-                >
-                  #{tag}
-                </span>
-              ))}
-            </div>
-
-            {/* Share Button */}
-            <div className="flex items-center gap-4 mb-8 pb-8 border-b border-palette-medium">
-              <button
-                onClick={handleShare}
-                className="flex items-center gap-2 text-palette-warm hover:text-palette-deepest transition-colors"
-              >
-                <Share2 className="w-4 h-4" />
-                Share Article
-              </button>
-            </div>
-
-            {/* Content */}
-            {post.isPremium ? (
-              // Premium content - show preview
-              <div>
-                <div className="prose prose-lg max-w-none text-palette-dark">
-                  <div dangerouslySetInnerHTML={{ 
-                    __html: post.content.split('\n').slice(0, 15).join('\n') 
-                  }} />
-                </div>
-                
-                {/* Premium Gate */}
-                <div className="mt-8 p-8 bg-gradient-to-r from-burgundy-50 to-cream-100 rounded-xl border border-burgundy-200">
-                  <div className="text-center">
-                    <div className="w-16 h-16 bg-burgundy-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <Eye className="w-8 h-8 text-white" />
-                    </div>
-                    <h3 className="text-xl font-bold text-palette-deepest mb-3">
-                      Continue Reading with Premium
-                    </h3>
-                    <p className="text-palette-dark mb-6 max-w-lg mx-auto">
-                      This article contains premium insights available to subscribers. 
-                      Get unlimited access to all content, exercises, and community features.
-                    </p>
-                    <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                      <Link href="/subscribe" className="btn-primary">
-                        Subscribe for KES 299/month
-                      </Link>
-                      <Link href="/subscribe" className="btn-secondary">
-                        View All Plans
-                      </Link>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              // Free content - show full article
-              <div className="prose prose-lg max-w-none text-palette-dark">
-                <div dangerouslySetInnerHTML={{ __html: post.content }} />
-              </div>
-            )}
-          </article>
-
-          {/* Related Articles CTA */}
-          <div className="card p-8 text-center">
-            <h3 className="text-2xl font-bold text-palette-deepest mb-4 font-serif">
-              Explore More Paradoxes
-            </h3>
-            <p className="text-palette-dark mb-6">
-              This article is part of "The Paradox Engine" - a complete framework for 
-              transforming life's tensions into breakthrough moments.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/musings" className="btn-secondary">
-                More Articles
-              </Link>
-              <Link href="/subscribe" className="btn-primary">
-                Get Full Access
-              </Link>
-            </div>
-          </div>
-        </div>
-      </main>
-      
+      <div className="pt-24 pb-16">
+        <ContentReader
+          title={article.title}
+          category={article.category}
+          content={article.content}
+          isUnlocked={article.isPremium}
+          previewPercentage={article.isPremium ? 100 : 60}
+        />
+      </div>
       <Footer />
-    </div>
+    </main>
   )
-} 
+}

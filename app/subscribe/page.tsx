@@ -3,7 +3,7 @@ import Subscribe from '@/components/Subscribe'
 import Footer from '@/components/Footer'
 
 export const metadata = {
-  title: 'Join Early Access - Personal Evolution',
+  title: 'Join Early Access - Paradox Engine',
   description: 'Be among the first to receive exclusive weekly insights on personal transformation.',
 }
 

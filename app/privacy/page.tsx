@@ -323,7 +323,7 @@ export default function PrivacyPolicy() {
                 <div className="space-y-2 text-palette-dark">
                   <p><strong>Email:</strong> privacy@paradox-engine.com</p>
                   <p><strong>Response Time:</strong> Within 30 days</p>
-                  <p><strong>Data Protection Officer:</strong> Thomas Njeru</p>
+                  <p><strong>Data Protection Officer:</strong> Privacy Team</p>
                 </div>
               </div>
               

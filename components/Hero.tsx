@@ -55,14 +55,14 @@ export default function Hero() {
             </div>
 
             <h1 className="text-book-title mb-6">
-              Transform Your
-              <span className="block text-gradient-gold">Personal Evolution</span>
+              Unlock Your
+              <span className="block text-gradient-gold">Paradox Engine</span>
             </h1>
 
             <p className="text-prose mb-8 text-burgundy-700">
               Join our exclusive early adopter community and receive weekly insights 
-              on personal growth, mindset transformation, and life mastery. 
-              Be among the first to experience our revolutionary approach to personal evolution.
+              on transformation, mindset evolution, and unlocking life's paradoxes. 
+              Be among the first to experience our revolutionary approach to growth.
             </p>
 
             {/* Benefits */}
@@ -151,8 +151,8 @@ export default function Hero() {
                   </div>
                   
                   <h2 className="text-3xl font-display text-cream-50 mb-4">
-                    Personal
-                    <span className="block text-gold-400">Evolution</span>
+                    Paradox
+                    <span className="block text-gold-400">Engine</span>
                   </h2>
                   
                   <div className="divider-gold my-6" />
