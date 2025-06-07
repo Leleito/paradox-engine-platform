@@ -9,23 +9,89 @@ interface DynamicHeroProps {
   onSignup?: (email: string) => void
 }
 
+// Fallback settings when Sanity is unavailable
+const fallbackSettings: BookSettings = {
+  bookTitle: "The Paradox Engine",
+  bookSubtitle: "Transform tension into triumph with the integrated framework for navigating life's contradictions",
+  heroTagline: "Master the Art of Embracing Contradiction",
+  heroDescription: "Discover the revolutionary framework that transforms life's tensions into your greatest assets.",
+  earlyAccessMessage: "Join our exclusive early adopter community and get advance access to transformational content that bridges psychology, philosophy, and practical wisdom.",
+  signupBenefits: [
+    { benefit: "Access to the complete Paradox Engine framework", icon: "🎯" },
+    { benefit: "Integrated content across all life domains", icon: "🌟" },
+    { benefit: "Personal dashboard with progress tracking", icon: "📊" },
+    { benefit: "Weekly transformational insights", icon: "💡" }
+  ],
+  signupCtaText: "Get Early Access",
+  readingProgressMessage: "Continue your transformation",
+  exerciseCompletionMessage: "Exercise completed!",
+  socialProof: {
+    earlyAdopterCount: 1250,
+    testimonials: [
+      {
+        text: "The framework that finally connects all the dots of personal growth.",
+        author: "Sarah Chen",
+        role: "Entrepreneur"
+      },
+      {
+        text: "This changes everything about how I approach challenges.",
+        author: "Marcus Johnson", 
+        role: "Executive Coach"
+      },
+      {
+        text: "The most comprehensive approach to life transformation I've seen.",
+        author: "Dr. Elena Rodriguez",
+        role: "Psychologist"
+      }
+    ]
+  },
+  footerTagline: "Transform tension into triumph"
+}
+
 export default function DynamicHero({ onSignup }: DynamicHeroProps) {
-  const [settings, setSettings] = useState<BookSettings | null>(null)
+  const [settings, setSettings] = useState<BookSettings>(fallbackSettings)
   const [email, setEmail] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [message, setMessage] = useState('')
+  const [isLoading, setIsLoading] = useState(true)
+  const [sanityConnected, setSanityConnected] = useState(false)
 
   useEffect(() => {
     async function fetchSettings() {
       try {
+        console.log('Attempting to fetch book settings from Sanity...')
         const bookSettings = await getBookSettings()
-        setSettings(bookSettings)
+        
+        if (bookSettings && Object.keys(bookSettings).length > 0) {
+          console.log('Successfully loaded Sanity settings')
+          setSettings({
+            ...fallbackSettings,
+            ...bookSettings
+          })
+          setSanityConnected(true)
+        } else {
+          console.log('No Sanity data found, using fallback settings')
+        }
       } catch (error) {
-        console.error('Error fetching book settings:', error)
+        console.error('Error fetching book settings from Sanity:', error)
+        console.log('Using fallback settings due to Sanity connection issue')
+      } finally {
+        setIsLoading(false)
       }
     }
+    
+    // Set a timeout to prevent infinite loading
+    const timeoutId = setTimeout(() => {
+      if (isLoading) {
+        console.log('Sanity fetch timeout, using fallback settings')
+        setIsLoading(false)
+      }
+    }, 3000)
+
     fetchSettings()
-  }, [])
+
+    return () => clearTimeout(timeoutId)
+  }, [isLoading])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -57,14 +123,22 @@ export default function DynamicHero({ onSignup }: DynamicHeroProps) {
     }
   }
 
-  if (!settings) {
+  // Show minimal loading only for very brief moment
+  if (isLoading) {
     return (
       <section className="relative min-h-screen flex items-center justify-center px-4 py-20">
-        <div className="animate-pulse">
-          <div className="h-16 bg-burgundy-200 rounded mb-6 w-96"></div>
-          <div className="h-6 bg-burgundy-100 rounded mb-4 w-80"></div>
-          <div className="h-6 bg-burgundy-100 rounded mb-8 w-72"></div>
-          <div className="h-12 bg-gold-200 rounded w-64"></div>
+        <div className="max-w-6xl mx-auto">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            {/* Loading skeleton */}
+            <div className="text-center lg:text-left space-y-6">
+              <div className="h-4 bg-burgundy-200/50 rounded-full w-32 animate-pulse" />
+              <div className="h-16 bg-burgundy-200/50 rounded-lg w-full animate-pulse" />
+              <div className="h-6 bg-burgundy-100/50 rounded w-4/5 animate-pulse" />
+              <div className="h-6 bg-burgundy-100/50 rounded w-3/4 animate-pulse" />
+              <div className="h-12 bg-gold-200/50 rounded-lg w-64 animate-pulse" />
+            </div>
+            <div className="aspect-[3/4] bg-burgundy-100/30 rounded-lg animate-pulse max-w-md mx-auto" />
+          </div>
         </div>
       </section>
     )
@@ -74,6 +148,19 @@ export default function DynamicHero({ onSignup }: DynamicHeroProps) {
     <section className="relative min-h-screen flex items-center justify-center px-4 py-20">
       {/* Background gradient */}
       <div className="absolute inset-0 bg-gradient-to-br from-burgundy-900 via-burgundy-800 to-burgundy-900 opacity-10" />
+      
+      {/* Sanity connection indicator (dev only) */}
+      {process.env.NODE_ENV === 'development' && (
+        <div className="fixed top-4 right-4 z-50">
+          <div className={`px-3 py-1 rounded-full text-xs font-serif ${
+            sanityConnected 
+              ? 'bg-green-100 text-green-800 border border-green-200' 
+              : 'bg-yellow-100 text-yellow-800 border border-yellow-200'
+          }`}>
+            {sanityConnected ? 'Sanity Connected' : 'Using Fallback Data'}
+          </div>
+        </div>
+      )}
       
       <div className="relative z-10 max-w-6xl mx-auto">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
@@ -101,26 +188,43 @@ export default function DynamicHero({ onSignup }: DynamicHeroProps) {
             {/* Benefits */}
             <div className="space-y-3 mb-8">
               {settings.signupBenefits?.map((benefit, index) => (
-                <div key={index} className="flex items-center gap-3">
-                  <div className="w-5 h-5 bg-gold-500 rounded-full flex items-center justify-center">
+                <motion.div 
+                  key={index} 
+                  className="flex items-center gap-3"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                >
+                  <div className="w-5 h-5 bg-gold-500 rounded-full flex items-center justify-center flex-shrink-0">
                     <span className="text-xs">{benefit.icon}</span>
                   </div>
                   <span className="text-burgundy-800 font-serif">{benefit.benefit}</span>
-                </div>
+                </motion.div>
               ))}
             </div>
 
             {/* Social Proof */}
             {settings.socialProof?.earlyAdopterCount > 0 && (
-              <div className="mb-6 p-4 bg-gold-500/10 rounded-sm border border-gold-500/20">
+              <motion.div 
+                className="mb-6 p-4 bg-gold-500/10 rounded-sm border border-gold-500/20"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.4 }}
+              >
                 <p className="text-sm text-burgundy-700 font-serif">
                   Join {settings.socialProof.earlyAdopterCount}+ early adopters already transforming their lives
                 </p>
-              </div>
+              </motion.div>
             )}
 
             {/* Signup Form */}
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <motion.form 
+              onSubmit={handleSubmit} 
+              className="space-y-4"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.5 }}
+            >
               <div className="flex flex-col sm:flex-row gap-3">
                 <input
                   type="email"
@@ -130,13 +234,15 @@ export default function DynamicHero({ onSignup }: DynamicHeroProps) {
                   required
                   className="input-elegant flex-1"
                 />
-                <button
+                <motion.button
                   type="submit"
                   disabled={isSubmitting}
                   className="btn-book whitespace-nowrap"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                 >
                   {isSubmitting ? 'Joining...' : settings.signupCtaText}
-                </button>
+                </motion.button>
               </div>
               
               {message && (
@@ -150,7 +256,7 @@ export default function DynamicHero({ onSignup }: DynamicHeroProps) {
                   {message}
                 </motion.p>
               )}
-            </form>
+            </motion.form>
 
             <p className="text-sm text-burgundy-600 mt-4 font-serif">
               Early access • Exclusive content • Join the community
@@ -382,7 +488,13 @@ export default function DynamicHero({ onSignup }: DynamicHeroProps) {
             
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {settings.socialProof.testimonials.slice(0, 3).map((testimonial, index) => (
-                <div key={index} className="card-book text-center">
+                <motion.div 
+                  key={index} 
+                  className="card-book text-center"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                >
                   <p className="text-burgundy-700 font-serif italic mb-4">
                     "{testimonial.text}"
                   </p>
@@ -390,13 +502,13 @@ export default function DynamicHero({ onSignup }: DynamicHeroProps) {
                     <p className="font-display text-burgundy-800">{testimonial.author}</p>
                     <p className="text-sm text-burgundy-600 font-serif">{testimonial.role}</p>
                   </div>
-                </div>
+                </motion.div>
               ))}
             </div>
           </motion.div>
         )}
 
-        {/* About the Author */}
+        {/* About the Author - Enhanced with fallback data */}
         <motion.div
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
@@ -420,23 +532,27 @@ export default function DynamicHero({ onSignup }: DynamicHeroProps) {
                   rather than resolve them. The tension between security and purpose became the 
                   creative force that built everything meaningful in my journey."
                 </p>
-                <a 
+                <motion.a 
                   href="/about"
                   className="btn-gold inline-flex items-center gap-2"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                 >
                   Learn More About the Journey
                   <span>→</span>
-                </a>
+                </motion.a>
               </div>
               
               <div className="relative">
                 <div className="aspect-square bg-gradient-to-br from-burgundy-800/5 to-gold-500/5 rounded-lg border border-gold-500/20 flex items-center justify-center overflow-hidden">
                   <div className="text-center">
-                    {/* Author Photo - Replace with actual photo when available */}
+                    {/* Author Photo - Enhanced with animation */}
                     <motion.div 
                       className="w-32 h-32 mx-auto mb-4 rounded-full overflow-hidden shadow-xl border-4 border-gold-500/30"
+                      initial={{ scale: 0.8, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ duration: 0.8, delay: 0.7 }}
                       whileHover={{ scale: 1.1 }}
-                      transition={{ duration: 0.3 }}
                     >
                       <div className="w-full h-full bg-gradient-to-br from-gold-500 to-gold-600 flex items-center justify-center">
                         {/* Placeholder - replace src with actual photo path when available */}
@@ -454,7 +570,12 @@ export default function DynamicHero({ onSignup }: DynamicHeroProps) {
                         */}
                       </div>
                     </motion.div>
-                    <div className="px-4">
+                    <motion.div 
+                      className="px-4"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.6, delay: 0.8 }}
+                    >
                       <h4 className="text-burgundy-800 font-display text-lg mb-2">Thomas Njeru</h4>
                       <p className="text-burgundy-700 font-serif text-sm mb-1">
                         Co-founder & CEO of Pula
@@ -465,7 +586,7 @@ export default function DynamicHero({ onSignup }: DynamicHeroProps) {
                       <p className="text-gold-600 font-serif text-xs mt-2">
                         Protecting 16+ million farmers across Africa & Asia
                       </p>
-                    </div>
+                    </motion.div>
                   </div>
                 </div>
               </div>
