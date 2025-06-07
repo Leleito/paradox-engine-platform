@@ -53,7 +53,6 @@ export const bookContent = defineType({
       name: 'excerpt',
       title: 'Excerpt/Teaser',
       type: 'text',
-      rows: 3,
       validation: Rule => Rule.max(200)
     }),
     defineField({
